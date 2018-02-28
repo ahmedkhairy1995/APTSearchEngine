@@ -1,0 +1,97 @@
+<component name="libraryTable">
+  <library name="org.apache.opennlp:opennlp-brat-annotator:1.8.4" type="repository">
+    <properties maven-id="org.apache.opennlp:opennlp-brat-annotator:1.8.4" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/opennlp-brat-annotator-1.8.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-container-grizzly2-http-2.25.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.inject-2.5.0-b30.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/grizzly-http-server-2.3.28.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/grizzly-http-2.3.28.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/grizzly-framework-2.3.28.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-common-2.25.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.annotation-api-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-guava-2.25.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hk2-api-2.5.0-b30.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hk2-utils-2.5.0-b30.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/aopalliance-repackaged-2.5.0-b30.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hk2-locator-2.5.0-b30.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javassist-3.20.0-GA.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/osgi-resource-locator-1.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-server-2.25.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-client-2.25.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-media-jaxb-2.25.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/validation-api-1.1.0.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.ws.rs-api-2.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-media-json-jackson-2.25.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-entity-filtering-2.25.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-jaxrs-base-2.8.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-core-2.8.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-databind-2.8.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-jaxrs-json-provider-2.8.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-module-jaxb-annotations-2.8.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-annotations-2.8.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/opennlp-tools-1.8.4.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/opennlp-brat-annotator-1.8.4-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-container-grizzly2-http-2.25-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.inject-2.5.0-b30-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/grizzly-http-server-2.3.28-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/grizzly-http-2.3.28-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/grizzly-framework-2.3.28-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-common-2.25-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.annotation-api-1.2-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hk2-api-2.5.0-b30-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hk2-utils-2.5.0-b30-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/aopalliance-repackaged-2.5.0-b30-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hk2-locator-2.5.0-b30-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javassist-3.20.0-GA-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/osgi-resource-locator-1.0.1-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-server-2.25-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-client-2.25-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-media-jaxb-2.25-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/validation-api-1.1.0.Final-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.ws.rs-api-2.0.1-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-media-json-jackson-2.25-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-entity-filtering-2.25-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-jaxrs-base-2.8.4-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-core-2.8.4-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-databind-2.8.4-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-jaxrs-json-provider-2.8.4-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-module-jaxb-annotations-2.8.4-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-annotations-2.8.4-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/opennlp-tools-1.8.4-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/opennlp-brat-annotator-1.8.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-container-grizzly2-http-2.25-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.inject-2.5.0-b30-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/grizzly-http-server-2.3.28-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/grizzly-http-2.3.28-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/grizzly-framework-2.3.28-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-common-2.25-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.annotation-api-1.2-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-guava-2.25-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hk2-api-2.5.0-b30-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hk2-utils-2.5.0-b30-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/aopalliance-repackaged-2.5.0-b30-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hk2-locator-2.5.0-b30-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javassist-3.20.0-GA-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/osgi-resource-locator-1.0.1-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-server-2.25-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-client-2.25-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-media-jaxb-2.25-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/validation-api-1.1.0.Final-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.ws.rs-api-2.0.1-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-media-json-jackson-2.25-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey-entity-filtering-2.25-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-jaxrs-base-2.8.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-core-2.8.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-databind-2.8.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-jaxrs-json-provider-2.8.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-module-jaxb-annotations-2.8.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jackson-annotations-2.8.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/opennlp-tools-1.8.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

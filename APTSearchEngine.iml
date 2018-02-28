@@ -8,5 +8,10 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="org.jsoup:jsoup:1.11.2" level="project" />
+    <orderEntry type="library" name="org.apache.opennlp:opennlp-brat-annotator:1.8.4" level="project" />
+    <orderEntry type="library" name="org.apache.opennlp:opennlp-maxent:3.0.3" level="project" />
+    <orderEntry type="library" name="org.apache.opennlp:opennlp-morfologik-addon:1.8.4" level="project" />
+    <orderEntry type="library" name="org.apache.opennlp:opennlp-uima:1.8.4" level="project" />
+    <orderEntry type="library" name="org.apache.opennlp:opennlp-tools:1.8.4" level="project" />
   </component>
 </module>
