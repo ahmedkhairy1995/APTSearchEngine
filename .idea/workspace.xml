@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cd815972-7421-4aec-a6c3-51447b7ec4bf" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/src/com/APT/SearchEngine/Data/Data.java" afterPath="$PROJECT_DIR$/src/com/APT/SearchEngine/Data/Data.java" />
       <change beforePath="$PROJECT_DIR$/src/com/APT/SearchEngine/Indexer/Indexer.java" afterPath="$PROJECT_DIR$/src/com/APT/SearchEngine/Indexer/Indexer.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -18,8 +17,8 @@
       <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="80" lean-forward="true" selection-start-line="11" selection-start-column="80" selection-end-line="11" selection-end-column="80" />
+            <state relative-caret-position="204">
+              <caret line="12" column="58" lean-forward="true" selection-start-line="11" selection-start-column="12" selection-end-line="12" selection-end-column="58" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -62,20 +61,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Indexer.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Indexer.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Indexer/Indexer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="9" column="16" lean-forward="false" selection-start-line="9" selection-start-column="16" selection-end-line="9" selection-end-column="16" />
+            <state relative-caret-position="289">
+              <caret line="17" column="84" lean-forward="false" selection-start-line="17" selection-start-column="84" selection-end-line="17" selection-end-column="84" />
               <folding>
-                <element signature="e#203#204#0" expanded="true" />
-                <element signature="e#227#228#0" expanded="true" />
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Data.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Data.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Data/Data.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="119">
@@ -111,12 +109,12 @@
         <option value="$PROJECT_DIR$/src/Main.java" />
         <option value="$PROJECT_DIR$/src/com/APT/SearchEngine/Main.java" />
         <option value="$PROJECT_DIR$/src/com/APT/SearchEngine/Models/WordModel.java" />
-        <option value="$PROJECT_DIR$/src/com/APT/SearchEngine/Indexer/Indexer.java" />
         <option value="$PROJECT_DIR$/src/com/APT/SearchEngine/Data/Data.java" />
+        <option value="$PROJECT_DIR$/src/com/APT/SearchEngine/Indexer/Indexer.java" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="10" />
     <option name="y" value="20" />
     <option name="width" value="1346" />
@@ -344,7 +342,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -439,27 +437,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="80" lean-forward="true" selection-start-line="11" selection-start-column="80" selection-end-line="11" selection-end-column="80" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Indexer/Indexer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="16" lean-forward="false" selection-start-line="9" selection-start-column="16" selection-end-line="9" selection-end-column="16" />
-          <folding>
-            <element signature="e#203#204#0" expanded="true" />
-            <element signature="e#227#228#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Models/WordModel.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -493,6 +470,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="58" lean-forward="true" selection-start-line="11" selection-start-column="12" selection-end-line="12" selection-end-column="58" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Data/Data.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
@@ -500,6 +487,16 @@
           <folding>
             <element signature="e#212#213#0" expanded="true" />
             <element signature="e#244#245#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Indexer/Indexer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" column="84" lean-forward="false" selection-start-line="17" selection-start-column="84" selection-end-line="17" selection-end-column="84" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
