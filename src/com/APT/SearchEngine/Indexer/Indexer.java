@@ -75,7 +75,7 @@ public class Indexer {
                         //checking if this is an inner opening tag to push tag to my stack
                         else if(j!=0 && isInnerOpeningTag(word)) myStack.push(word);
 
-                        //If stack is not empty, we're allowed to process this word (since it's not a duplicate!)
+                        //If stack is empty, we're allowed to process this word (since it's not a duplicate!)
                         else if (myStack.isEmpty()){
                             //Add this word to my list to save it to my Database
                             WordModel processedWord=new WordModel(porterStemmer.stem(word),documents[index],(i+2)-allElements.size(),type);
@@ -93,6 +93,7 @@ public class Indexer {
             }
 
             //Save processed words to my database
+
             //....
             for (int i=0;i<processedWords.size();i++){
                 //Calculating word frequency
@@ -109,7 +110,7 @@ public class Indexer {
         catch (Exception e){
             e.printStackTrace();
         }
-        
+
         if((index+numThreads)>=documents.length) return;
 
         //Clear all data structures for the next document
@@ -144,6 +145,8 @@ public class Indexer {
         text = text.replace("~", "");
         text = text.replace(";", "");
         text = text.replace("^", "");
+        text = text.replace("<", " <");
+        text = text.replace(">", "> ");
         ArrayList<String> purifiedList= new ArrayList<>(Arrays.asList(text.split(" ")));
         purifiedList.removeIf((String word) -> word.startsWith("&"));
         purifiedList.removeIf(this::isAStopWord);
