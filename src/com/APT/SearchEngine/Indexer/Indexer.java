@@ -109,11 +109,13 @@ public class Indexer {
         catch (Exception e){
             e.printStackTrace();
         }
+        
+        if((index+numThreads)>=documents.length) return;
 
+        //Clear all data structures for the next document
         myStack.clear();
         processedWords.clear();
         wordCount.clear();
-        if((index+numThreads)>=documents.length) return;
         index(index+numThreads,porterStemmer,myStack,processedWords,wordCount);
     }
 
