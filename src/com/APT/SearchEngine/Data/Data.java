@@ -1,12 +1,21 @@
 package com.APT.SearchEngine.Data;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Data {
-    private static HashMap<String,Integer> documents=new HashMap<>();
+
+    private static Set<String> documents=new HashSet<>();
+
+    public static HashMap<String, Integer> getMyDocuments() {
+        return myDocuments;
+    }
+
+    private static HashMap<String,Integer> myDocuments=new HashMap<>();
     private static Set<String> stopWords = Stream.of("i" ,
             "me" ,
             "my" ,
@@ -135,7 +144,7 @@ public class Data {
             "should" ,
             "now").collect(Collectors.toSet());
 
-    public static HashMap<String, Integer> getDocuments() {
+    public static Set<String> getDocuments() {
         return documents;
     }
 

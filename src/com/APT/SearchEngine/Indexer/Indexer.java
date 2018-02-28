@@ -1,3 +1,4 @@
+
 package com.APT.SearchEngine.Indexer;
 
 import com.APT.SearchEngine.Data.Data;
@@ -11,7 +12,7 @@ import org.jsoup.select.Elements;
 import java.util.*;
 
 public class Indexer {
-    private String[] documents=(String[]) Data.getDocuments().keySet().toArray();
+    private String[] documents=(String[]) Data.getMyDocuments().keySet().toArray();
     private int numThreads;
 
     public void setNumThreads(int numThreads) {
