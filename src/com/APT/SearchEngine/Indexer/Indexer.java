@@ -15,8 +15,18 @@ import org.jsoup.select.Elements;
 import java.util.*;
 
 public class Indexer {
+    private Indexer indexer=null;
     private String[] documents=(String[]) Data.getMyDocuments().keySet().toArray();
     private int numThreads;
+
+    private Indexer(){
+    }
+    
+    public Indexer getInstance(){
+        if(indexer==null)
+            indexer=new Indexer();
+        return indexer;
+    }
 
     public void setNumThreads(int numThreads) {
         this.numThreads = numThreads;
