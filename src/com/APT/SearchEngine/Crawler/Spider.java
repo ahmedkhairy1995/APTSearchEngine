@@ -6,18 +6,14 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import java.io.*;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class Spider {
-
-
+class Spider {
     private static final int maxPages = 5000;
-    private static Set<String> pagesVisited = Data.getDocuments();
+    private Set<String> pagesVisited = Data.getDocuments();
     private List<String> currentPages = new LinkedList<>();
     private List<String> pagesToVisit = new LinkedList<>();
     private int numberOfThreads;
@@ -100,9 +96,7 @@ public class Spider {
         }
 
 
-        for(int i=0; i<numberOfThreads;i++)
-        {
-
+        for(int i=0; i<numberOfThreads;i++) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -110,8 +104,6 @@ public class Spider {
                 }
             }).start();
         }
-
-
     }
 
     /*Function that handles many threads trying to get next URL to access*/
@@ -119,13 +111,11 @@ public class Spider {
         String next;
         if(pagesToVisit.size()!=0) {
             synchronized (pagesToVisit) {
-
                 do {
                     next = this.pagesToVisit.remove(0);
                 } while (pagesVisited.contains(next));
                 pagesVisited.add(next);
             }
-
 
             synchronized (currentPages) {
                 this.currentPages.add(next);
@@ -177,10 +167,7 @@ public class Spider {
 
     }
 
-    private void writeURL(String URL,String file)
-    {
-
-
+    private void writeURL(String URL,String file) {
         try {
             // Assume default encoding.
             FileWriter fileWriter = new FileWriter(file,true);
@@ -203,8 +190,7 @@ public class Spider {
         }
     }
 
-    private void Search()
-    {
+    private void Search() {
         while(pagesVisited.size() < maxPages)
         {
             String currentURL = nextUrl();
@@ -213,8 +199,6 @@ public class Spider {
                 crawl(currentURL);
             }
         }
-
-
     }
 
 }

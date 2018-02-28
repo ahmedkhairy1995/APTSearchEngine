@@ -16,6 +16,5 @@ public class Main {
         ArrayList<String> purifiedList = new ArrayList<>(Arrays.asList(text.split(" ")));
         purifiedList.removeIf((String word) -> word.startsWith("&"));
         purifiedList.removeIf((String word) -> Data.getStopWords().contains(word));
-        int x=5;
     }
 }

@@ -14,5 +14,17 @@
     <orderEntry type="library" name="org.apache.opennlp:opennlp-uima:1.8.4" level="project" />
     <orderEntry type="library" name="org.apache.opennlp:opennlp-tools:1.8.4" level="project" />
     <orderEntry type="library" name="org.apache.hbase:hbase:0.94.14" level="project" />
+    <orderEntry type="library" name="org.apache.hbase:hbase-client:0.96.0-hadoop1" level="project" />
+    <orderEntry type="library" name="org.apache.hbase:hbase-common:0.96.0-hadoop1" level="project" />
+    <orderEntry type="library" name="org.apache.hbase:hbase-examples:0.96.1.1-hadoop1" level="project" />
+    <orderEntry type="library" name="org.apache.hbase:hbase-hadoop-compat:0.96.1.1-hadoop1" level="project" />
+    <orderEntry type="library" name="org.apache.hbase:hbase-hadoop1-compat:0.96.1.1-hadoop1" level="project" />
+    <orderEntry type="library" name="org.apache.hbase:hbase-it:0.96.1.1-hadoop1" level="project" />
+    <orderEntry type="library" name="org.apache.hbase:hbase-prefix-tree:0.96.1.1-hadoop1" level="project" />
+    <orderEntry type="library" name="org.apache.hbase:hbase-protocol:0.96.1.1-hadoop1" level="project" />
+    <orderEntry type="library" name="org.apache.hbase:hbase-server:0.96.1.1-hadoop1" level="project" />
+    <orderEntry type="library" name="org.apache.hbase:hbase-shell:0.96.1.1-hadoop1" level="project" />
+    <orderEntry type="library" name="org.apache.hbase:hbase-testing-util:0.96.1.1-hadoop1" level="project" />
+    <orderEntry type="library" name="org.apache.hbase:hbase-thrift:0.96.1.1-hadoop1" level="project" />
   </component>
 </module>

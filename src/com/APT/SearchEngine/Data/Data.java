@@ -10,11 +10,6 @@ import java.util.stream.Stream;
 public class Data {
 
     private static Set<String> documents=new HashSet<>();
-
-    public static HashMap<String, Integer> getMyDocuments() {
-        return myDocuments;
-    }
-
     private static HashMap<String,Integer> myDocuments=new HashMap<>();
     private static Set<String> stopWords = Stream.of("i" ,
             "me" ,
@@ -146,6 +141,10 @@ public class Data {
 
     public static Set<String> getDocuments() {
         return documents;
+    }
+
+    public static HashMap<String, Integer> getMyDocuments() {
+        return myDocuments;
     }
 
     public static Set<String> getStopWords() {

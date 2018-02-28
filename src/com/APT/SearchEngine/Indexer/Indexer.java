@@ -4,6 +4,9 @@ package com.APT.SearchEngine.Indexer;
 import com.APT.SearchEngine.Data.Data;
 import com.APT.SearchEngine.Models.WordModel;
 import opennlp.tools.stemmer.PorterStemmer;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -66,6 +69,7 @@ public class Indexer {
 
                     //Get the element as an array of strings
                     List<String> items=purifyElements(allElements.get(i).toString());
+
                     for (int j=0;j<items.size();j++){
                         //Get a word from my items
                         String word=items.get(i);
@@ -94,16 +98,14 @@ public class Indexer {
             }
 
             //Save processed words to my database
-
             //....
-            for (int i=0;i<processedWords.size();i++){
+            for (WordModel processedWord : processedWords) {
                 //Calculating word frequency
-                float wordFrequency=(float)wordCount.get(processedWords.get(i).getWord())/totalNumWords;
+                float wordFrequency = (float) wordCount.get(processedWord.getWord()) / totalNumWords;
 
-                try{
+                try {
 
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -122,6 +124,20 @@ public class Indexer {
     }
 
     private List<String> purifyElements(String text){
+        text = text.replace("&", " &");
+        text = text.replace(";", "; ");
+        ArrayList<String> purifiedList= new ArrayList<>(Arrays.asList(text.split(" ")));
+
+        //First we need to remove all HTML entities
+        purifiedList.removeIf((String word) -> (word.startsWith("&") && word.endsWith(";")));
+
+        //Second we need to remove all stop words
+        purifiedList.removeIf(this::isAStopWord);
+
+        //rejoin again all array into the string
+        text=String.join(" ",purifiedList);
+
+        //remove all unnecessary characters
         text = text.replace(","," ");
         text = text.replace("#"," ");
         text = text.replace("@"," ");
@@ -145,14 +161,15 @@ public class Indexer {
         text = text.replace(";", " ");
         text = text.replace("\"", " ");
         text = text.replace("$", " ");
+        text = text.replace("&", " ");
         text = text.replace("!", " ");
         text = text.replace("'", " ");
         text = text.replace("^", " ");
         text = text.replace("<", " <");
         text = text.replace(">", "> ");
-        ArrayList<String> purifiedList= new ArrayList<>(Arrays.asList(text.split(" ")));
-        purifiedList.removeIf((String word) -> word.startsWith("&"));
-        purifiedList.removeIf(this::isAStopWord);
+
+        //split string again
+        purifiedList= new ArrayList<>(Arrays.asList(text.split(" ")));
         return purifiedList;
     }
 
