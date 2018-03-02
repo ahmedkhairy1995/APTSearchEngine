@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.*;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +15,7 @@ import java.util.Set;
 class Spider {
     private static final int maxPages = 5000;
     private Set<String> pagesVisited = Data.getDocuments();
-    private List<String> currentPages = new LinkedList<>();
+    private Set<String> currentPages = new HashSet<>();
     private List<String> pagesToVisit = new LinkedList<>();
     private int numberOfThreads;
     private String bufferLine;
@@ -95,7 +96,7 @@ class Spider {
             System.out.println("Unable to read from file '" + pagesToVisitMemory +"'");
         }
 
-
+        currentPages.removeAll(pagesVisited);
         for(int i=0; i<numberOfThreads;i++) {
             new Thread(new Runnable() {
                 @Override
