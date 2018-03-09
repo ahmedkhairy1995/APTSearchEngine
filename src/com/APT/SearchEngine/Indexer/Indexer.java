@@ -4,9 +4,6 @@ package com.APT.SearchEngine.Indexer;
 import com.APT.SearchEngine.Data.Data;
 import com.APT.SearchEngine.Models.WordModel;
 import opennlp.tools.stemmer.PorterStemmer;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -21,7 +18,7 @@ public class Indexer {
 
     private Indexer(){
     }
-    
+
     public Indexer getInstance(){
         if(indexer==null)
             indexer=new Indexer();
@@ -130,12 +127,17 @@ public class Indexer {
         myStack.clear();
         processedWords.clear();
         wordCount.clear();
+
+        //Recursive call
         index(index+numThreads,porterStemmer,myStack,processedWords,wordCount);
     }
 
     private List<String> purifyElements(String text){
+        //Here we're modifying the string to remove HTML entities
         text = text.replace("&", " &");
         text = text.replace(";", "; ");
+
+        //Split the string by white spaces as delimiters
         ArrayList<String> purifiedList= new ArrayList<>(Arrays.asList(text.split(" ")));
 
         //First we need to remove all HTML entities
@@ -311,6 +313,7 @@ public class Indexer {
         return (Data.getStopWords().contains(word));
     }
 
+    //This method returns the total number of words in a document
     private int getTotalNumWords (Elements elements){
         Element mainElement=elements.get(0);
         ArrayList<String> innerHTML= new ArrayList<>(Arrays.asList(mainElement.text().split(" ")));

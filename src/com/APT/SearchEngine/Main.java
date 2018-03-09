@@ -12,7 +12,7 @@ import opennlp.tools.stemmer.*;
 
 public class Main {
     public static void main(String args[]) {
-        String text = "Ahmed &nbsp.. does love May";
+        String text = "Ahmed";
         ArrayList<String> purifiedList = new ArrayList<>(Arrays.asList(text.split(" ")));
         purifiedList.removeIf((String word) -> word.startsWith("&"));
         purifiedList.removeIf((String word) -> Data.getStopWords().contains(word));
