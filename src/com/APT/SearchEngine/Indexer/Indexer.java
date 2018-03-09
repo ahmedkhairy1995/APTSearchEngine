@@ -12,14 +12,15 @@ import org.jsoup.select.Elements;
 import java.util.*;
 
 public class Indexer {
-    private Indexer indexer=null;
-    private String[] documents=(String[]) Data.getMyDocuments().keySet().toArray();
+    private static Indexer indexer=null;
+//    private String[] documents=(String[]) Data.getMyDocuments().keySet().toArray();
+    private String[] documents={"https://www.google.com.eg/?gfe_rd=cr&dcr=1&ei=2NaiWpTxL_CZX9-vrDA"};
     private int numThreads;
 
     private Indexer(){
     }
 
-    public Indexer getInstance(){
+    public static Indexer getInstance(){
         if(indexer==null)
             indexer=new Indexer();
         return indexer;
@@ -29,7 +30,7 @@ public class Indexer {
         this.numThreads = numThreads;
     }
 
-    private void beginIndexing(){
+    public void beginIndexing(){
         for(int i=0;i<numThreads;i++){
             final int offset=i;
             new Thread(new Runnable() {
@@ -63,7 +64,7 @@ public class Indexer {
             int totalNumWords=getTotalNumWords(allElements);
 
             //Traversing from inner to outer
-            for(int i=allElements.size()-1;i>=0;i++){
+            for(int i=allElements.size()-1;i>0;i--){
 
                 //Get inner HTML content
                 String innerHTML=allElements.get(i).text();
@@ -72,6 +73,9 @@ public class Indexer {
                 if (innerHTML.length()!=0){
                     //Get the tag of this element
                     Tag tag=allElements.get(i).tag();
+
+                    //Skip some tags
+                    if(isUnneccessaryTag(tag)) continue;
                     int type=getTagRank(tag);
 
                     //Get the element as an array of strings
@@ -79,27 +83,44 @@ public class Indexer {
 
                     for (int j=0;j<items.size();j++){
                         //Get a word from my items
-                        String word=items.get(i);
+                        String word=items.get(j);
 
-                        //checking if this is an inner closing tag to pop tag from my stack
-                        if (!myStack.isEmpty() && isInnerClosingTag(word) && j!=(items.size()-1)) myStack.pop();
+                        //Checking if it's an empty word
+                        if(word.equals("")) continue;
 
-                        //checking if this is an inner opening tag to push tag to my stack
-                        else if(j!=0 && isInnerOpeningTag(word)) myStack.push(word);
-
-                        //If stack is empty, we're allowed to process this word (since it's not a duplicate!)
-                        else if (myStack.isEmpty()){
-                            //Add this word to my list to save it to my Database
-                            WordModel processedWord=new WordModel(porterStemmer.stem(word),documents[index],(i+2)-allElements.size(),type);
-                            processedWords.add(processedWord);
-
-                            //Update count of word in page
-                            if(!wordCount.containsKey(word))
-                                wordCount.put(word,1);
-                            else
-                                wordCount.computeIfPresent(word, (k, v) -> v + 1);
-
+                        //This is needed to avoid inserting inner attributes as words
+                        int occurrence;
+                        if(j==0){
+                            occurrence=getIndexOfClosingTagForFirstOpeningTag(word,items);
+                            if(occurrence!=-1){
+                                items.remove(occurrence);
+                                j=occurrence-1;
+                                continue;
+                            }
                         }
+                        else{
+                            //This is needed to skip inner tags
+                            occurrence=isInnerOpeningTag(word,items);
+                            if(occurrence!=-1){
+                                j = occurrence;
+                                continue;
+                            }
+                        }
+
+                        //if it's not a word or number
+                        if(!(word.matches("[A-Za-z0-9ٍ]+"))) continue;
+
+                        //Add this word to my list to save it to my Database
+                        String stemmedWord=porterStemmer.stem(word);
+                        WordModel processedWord=new WordModel(stemmedWord,documents[index],(i+2)-allElements.size(),type);
+                        processedWords.add(processedWord);
+                        System.out.print(processedWord.getWord()+"\n");
+
+                        //Update count of word in page
+                        if(!wordCount.containsKey(stemmedWord))
+                            wordCount.put(stemmedWord,1);
+                        else
+                            wordCount.computeIfPresent(stemmedWord, (k, v) -> v + 1);
                     }
                 }
             }
@@ -107,10 +128,12 @@ public class Indexer {
             //Save processed words to my database
             //....
             for (WordModel processedWord : processedWords) {
-                //Calculating word frequency
-                float wordFrequency = (float) wordCount.get(processedWord.getWord()) / totalNumWords;
-
                 try {
+                    //Calculating word frequency
+                    float wordFrequency = (float) wordCount.get(processedWord.getWord()) / totalNumWords;
+                    processedWord.setFrequency(wordFrequency);
+
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -130,6 +153,14 @@ public class Indexer {
 
         //Recursive call
         index(index+numThreads,porterStemmer,myStack,processedWords,wordCount);
+    }
+
+    private int getIndexOfClosingTagForFirstOpeningTag(String word, List<String> items){
+        //This is case for : <p color="red">
+        int occurrence=-1;
+        if(word.startsWith("<") && !word.endsWith(">"))
+            occurrence=items.indexOf(">");
+        return occurrence;
     }
 
     private List<String> purifyElements(String text){
@@ -179,18 +210,47 @@ public class Indexer {
         text = text.replace("^", " ");
         text = text.replace("<", " <");
         text = text.replace(">", "> ");
+        text = text.replace("\n", " ");
+        text = text.replace("×"," ");
 
         //split string again
         purifiedList= new ArrayList<>(Arrays.asList(text.split(" ")));
+
+        //remove empty items
+        purifiedList.removeIf((String word) -> word.equals(""));
+
+        //This is needed to remove the latest closing parent tag
+        purifiedList.remove(purifiedList.size()-1);
+
+        //return list
         return purifiedList;
     }
 
-    private boolean isInnerOpeningTag(String word){
-        return (word.startsWith("<") && word.endsWith(">"));
+    private int isInnerOpeningTag(String word,List<String> items){
+        //We have two cases of inner tags
+        //1st Case is : <i> ahmed </a> , words will be <i> ahmed </a>
+        //2nd Case is : <a src="" href=""> ahmed </a> , words will be <a src href > ahmed </a>
+
+        int occurrence=-1;
+        if(!(word.startsWith("<") && word.length()>1))
+            return occurrence;
+
+        //split the string into characters
+        char [] letters=word.toCharArray();
+
+        StringBuilder tagName=new StringBuilder();
+
+        //retrieve the tag name
+        for (char letter : letters) if (letter != '<' && letter != '>') tagName.append(letter);
+
+        //get index for the final closing tag
+        occurrence=items.lastIndexOf("</"+tagName+">");
+
+        return occurrence;
     }
 
-    private boolean isInnerClosingTag(String word){
-        return (word.startsWith("</") && word.endsWith(">"));
+    private boolean isUnneccessaryTag(Tag tag){
+        return (tag.getName().equals("head") || tag.getName().equals("html")|| tag.getName().equals("div")|| tag.getName().equals("body")|| tag.getName().equals("style")|| tag.getName().equals("script"));
     }
 
     private int getTagRank(Tag tag){
