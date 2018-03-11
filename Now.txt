@@ -3711,3 +3711,8 @@ http://caveofprogramming.teachable.com/courses/mysql-and-sql-for-beginners
 http://caveofprogramming.teachable.com/courses/servlets-and-jsps-creating-web-applications-with-java
 http://caveofprogramming.teachable.com/courses/java-swing-gui-programming-from-beginner-to-expert
 http://caveofprogramming.teachable.com/courses/learn-c-tutorial
+
+http://caveofprogramming.teachable.com/courses/learn-perl-5-by-doing-it
+http://caveofprogramming.teachable.com/courses/learn-c-tutorial
+http://caveofprogramming.teachable.com/courses/java-swing-gui-programming-from-beginner-to-expert
+http://caveofprogramming.teachable.com/courses/java-for-complete-beginners
