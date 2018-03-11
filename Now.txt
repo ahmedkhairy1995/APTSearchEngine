@@ -3741,3 +3741,8 @@ https://www.caveofprogramming.com/library/index.html#as3-flash
 https://www.caveofprogramming.com/library/index.html#java-collections-framework
 https://www.caveofprogramming.com/library/index.html#mysql
 https://www.caveofprogramming.com/library/index.html#mastering-java-swing
+
+https://www.caveofprogramming.com/library/index.html#mastering-java-swing
+https://www.caveofprogramming.com/library/index.html#mysql
+https://www.caveofprogramming.com/library/index.html#java-collections-framework
+https://ssl.usefedora.com/login_register.php?affcode=&site=984#register
