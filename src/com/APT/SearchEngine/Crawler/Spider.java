@@ -6,11 +6,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import java.io.*;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import me.jamesfrost.robotsio.*;
+
+
 
 class Spider {
     private static final int maxPages = 5000;
@@ -22,6 +24,9 @@ class Spider {
     private String currentPagesMemory = "Now.txt";
     private String pagesVisitedMemory = "Done.txt";
     private String pagesToVisitMemory = "Seeds.txt";
+    private RobotsParser MyParser = new RobotsParser("Shaalan");
+    private ArrayList<String> DisAllowedPath = new ArrayList<>();
+
 
 
     /*Constructor that takes # of threads and initializes all my variables */
