@@ -1,6 +1,7 @@
 package com.APT.SearchEngine.Crawler;
 
 import com.APT.SearchEngine.Data.Data;
+import javafx.util.Pair;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -9,13 +10,11 @@ import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.util.*;
-
-import me.jamesfrost.robotsio.*;
-
+import java.util.concurrent.TimeUnit;
 
 
 class Spider {
-    private static final int maxPages = 5000;
+    private int maxPages = 5000;
     private Set<String> pagesVisited = Data.getDocuments();
     private Set<String> currentPages = new HashSet<>();
     private List<String> pagesToVisit = new LinkedList<>();
@@ -24,11 +23,12 @@ class Spider {
     private String currentPagesMemory = "Now.txt";
     private String pagesVisitedMemory = "Done.txt";
     private String pagesToVisitMemory = "Seeds.txt";
-    private RobotsParser MyParser = new RobotsParser("Shaalan");
     private ArrayList<String> DisAllowedPath = new ArrayList<>();
+    private ArrayList<Pair<String,Long>> Database = new ArrayList<Pair<String,Long>>();
+    private Set<String> newsPaperSites = Data.getNewsSite();
 
 
-
+    
     /*Constructor that takes # of threads and initializes all my variables */
     public Spider(int threadsNumber) throws IOException {
         numberOfThreads = threadsNumber;
@@ -102,6 +102,14 @@ class Spider {
         }
 
         currentPages.removeAll(pagesVisited);
+
+
+        if(currentPages.size()==0 && pagesVisited.size() ==0 && pagesToVisit.size()==0)
+        {
+            //we are about to recrawl
+            initializeFromDatabase();
+            maxPages = maxPages + 1000;
+        }
         for(int i=0; i<numberOfThreads;i++) {
             new Thread(new Runnable() {
                 @Override
@@ -207,4 +215,51 @@ class Spider {
         }
     }
 
+
+    private boolean isNewsPaper(String URL)
+    {
+
+        Iterator iterator = newsPaperSites.iterator();
+
+        while (iterator.hasNext())
+        {
+            if(URL.toLowerCase().contains(((String)iterator.next()).toLowerCase()))
+                return true;
+
+        }
+        return false;
+    }
+    private void initializeFromDatabase ()
+    {
+        //Come here if I found no seeds in the files ( first phase of crawling is done and now we are recrawling)
+
+
+        //Fill the table of the database
+
+        //Database = GetAllTheStuff();
+        long millis = System.currentTimeMillis() % 1000;
+        long oneDay = TimeUnit.DAYS.toMillis(1);
+        long fourDays = TimeUnit.DAYS.toMillis(4);
+        boolean notVisited = false;
+        for (Pair<String,Long> item : Database) {
+
+            notVisited = false;
+            if(isNewsPaper(item.getKey()))
+            {
+                if(item.getValue() - millis > oneDay )
+                {
+                    pagesToVisit.add(item.getKey());
+                    notVisited = true;
+                }
+
+            }
+            if(item.getValue() - millis > fourDays )
+            {
+                pagesToVisit.add(item.getKey());
+                notVisited = true;
+            }
+            if(!notVisited)
+                pagesVisited.add(item.getKey());
+        }
+    }
 }

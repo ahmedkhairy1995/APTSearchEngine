@@ -11,6 +11,25 @@ public class Data {
 
     private static Set<String> documents=new HashSet<>();
     private static HashMap<String,Integer> myDocuments=new HashMap<>();
+
+    public static Set<String> getNewsSite() {
+        return newsSite;
+    }
+
+    private static Set<String> newsSite = Stream.of("www.ap.org",
+            "nytimes.com",
+            "www.washingtonpost.com",
+            "www.wsj.com",
+            "www.reuters.com",
+            "www.latimes.com/",
+            "cnn.com",
+            "bbc.com",
+            "www.telegraph.co.uk",
+            "www.theguardian.com",
+            "abcnews.go.com",
+            "forbes.com").collect(Collectors.toSet());
+
+
     private static Set<String> stopWords = Stream.of("i" ,
             "me" ,
             "my" ,
