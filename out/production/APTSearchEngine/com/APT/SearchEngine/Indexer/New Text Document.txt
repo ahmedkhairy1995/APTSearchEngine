@@ -1,0 +1,59 @@
+    private List<String> purifyElements(String text){
+        //Here we're modifying the string to remove HTML entities
+        text = text.replace("&", " &");
+        text = text.replace(";", "; ");
+
+        //Split the string by white spaces as delimiters
+        ArrayList<String> purifiedList= new ArrayList<>(Arrays.asList(text.split(" ")));
+
+        //First we need to remove all HTML entities
+        purifiedList.removeIf((String word) -> (word.startsWith("&") && word.endsWith(";")));
+
+        //Second we need to remove all stop words
+        purifiedList.removeIf(this::isAStopWord);
+
+        //rejoin again all array into the string
+        text=String.join(" ",purifiedList);
+
+        //remove all unnecessary characters
+        text = text.replace(","," ");
+        text = text.replace("#"," ");
+        text = text.replace("@"," ");
+        text = text.replace("?", " ");
+        text = text.replace(".", " ");
+        text = text.replace("(", " ");
+        text = text.replace(")", " ");
+        text = text.replace("{", " ");
+        text = text.replace("}", " ");
+        text = text.replace(":", " ");
+        text = text.replace("\\",  " ");
+        text = text.replace("[", " ");
+        text = text.replace("]", " ");
+        text = text.replace("|", " ");
+        text = text.replace("*", " ");
+        text = text.replace("+", " ");
+        text = text.replace("-", " ");
+        text = text.replace("=", " ");
+        text = text.replace("%", " ");
+        text = text.replace("~", " ");
+        text = text.replace(";", " ");
+        text = text.replace("\"", " ");
+        text = text.replace("$", " ");
+        text = text.replace("&", " ");
+        text = text.replace("!", " ");
+        text = text.replace("'", " ");
+        text = text.replace("^", " ");
+        text = text.replace("<", " <");
+        text = text.replace(">", "> ");
+        text = text.replace("\n", " ");
+        text = text.replace("×"," ");
+
+        //split string again
+        purifiedList= new ArrayList<>(Arrays.asList(text.split(" ")));
+
+        //This is needed to remove the latest closing parent tag
+        purifiedList.remove(purifiedList.size()-1);
+
+        //return list
+        return purifiedList;
+    }
