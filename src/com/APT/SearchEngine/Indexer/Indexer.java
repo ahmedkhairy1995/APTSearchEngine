@@ -85,8 +85,8 @@ public class Indexer {
                         //Get a word from my items
                         String word=items.get(j);
 
-                        //Checking if it's an empty word
-                        if(word.equals("")) continue;
+                        //if it's not a word or number
+                        if(!(word.matches("[A-Za-z0-9ٍ]+"))) continue;
 
                         //This is needed to avoid inserting inner attributes as words
                         int occurrence;
@@ -106,9 +106,6 @@ public class Indexer {
                                 continue;
                             }
                         }
-
-                        //if it's not a word or number
-                        if(!(word.matches("[A-Za-z0-9ٍ]+"))) continue;
 
                         //Add this word to my list to save it to my Database
                         String stemmedWord=porterStemmer.stem(word);
@@ -216,9 +213,6 @@ public class Indexer {
         //split string again
         purifiedList= new ArrayList<>(Arrays.asList(text.split(" ")));
 
-        //remove empty items
-        purifiedList.removeIf((String word) -> word.equals(""));
-
         //This is needed to remove the latest closing parent tag
         purifiedList.remove(purifiedList.size()-1);
 
@@ -228,7 +222,7 @@ public class Indexer {
 
     private int isInnerOpeningTag(String word,List<String> items){
         //We have two cases of inner tags
-        //1st Case is : <i> ahmed </a> , words will be <i> ahmed </a>
+        //1st Case is : <i> ahmed </i> , words will be <i> ahmed </i>
         //2nd Case is : <a src="" href=""> ahmed </a> , words will be <a src href > ahmed </a>
 
         int occurrence=-1;
