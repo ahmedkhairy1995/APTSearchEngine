@@ -3,13 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="cd815972-7421-4aec-a6c3-51447b7ec4bf" name="Default" comment="" />
     <list default="true" id="cd815972-7421-4aec-a6c3-51447b7ec4bf" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/com/APT/SearchEngine/Crawler/Spider.java" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/Now.txt" afterPath="$PROJECT_DIR$/Now.txt" />
-      <change beforePath="$PROJECT_DIR$/out/production/APTSearchEngine/Main.class" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/com/APT/SearchEngine/Crawler/CrawlerTest.java" afterPath="$PROJECT_DIR$/src/com/APT/SearchEngine/Crawler/CrawlerTest.java" />
-      <change beforePath="$PROJECT_DIR$/src/com/APT/SearchEngine/Data/Data.java" afterPath="$PROJECT_DIR$/src/com/APT/SearchEngine/Data/Data.java" />
-      <change beforePath="$PROJECT_DIR$/src/com/APT/SearchEngine/Indexer/Indexer.java" afterPath="$PROJECT_DIR$/src/com/APT/SearchEngine/Indexer/Indexer.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,6 +14,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/APTSearchEngine$Main.coverage" NAME="Main Coverage Results" MODIFIED="1521035857271" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
     <SUITE FILE_PATH="coverage/APTSearchEngine$CrawlerTest.coverage" NAME="CrawlerTest Coverage Results" MODIFIED="1520891498369" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
       <FILTER>com.APT.SearchEngine.Crawler.*</FILTER>
     </SUITE>
@@ -46,7 +41,8 @@
             <state relative-caret-position="221">
               <caret line="13" column="40" lean-forward="true" selection-start-line="13" selection-start-column="40" selection-end-line="13" selection-end-column="40" />
               <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#14060#14061#0" expanded="true" />
+                <element signature="e#14119#14120#0" expanded="true" />
               </folding>
 =======
 =======
@@ -184,6 +180,9 @@
     <option name="width" value="1382" />
     <option name="height" value="744" />
   </component>
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectView">
     <navigator currentView="Scope" currentSubView="Project Files" proportions="" version="1">
       <flattenPackages />
@@ -199,18 +198,17 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
-      <pane id="ProjectPane">
+      <pane id="AndroidView">
         <subPane>
           <expand>
             <path>
-              <item name="APTSearchEngine" type="b2602c69:ProjectViewProjectNode" />
-              <item name="APTSearchEngine" type="462c0819:PsiDirectoryNode" />
+              <item name="APTSearchEngine" type="1abcf292:AndroidViewProjectNode" />
+              <item name="APTSearchEngine" type="1039202d:NonAndroidModuleNode" />
             </path>
             <path>
-              <item name="APTSearchEngine" type="b2602c69:ProjectViewProjectNode" />
-              <item name="APTSearchEngine" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="APTSearchEngine" type="1abcf292:AndroidViewProjectNode" />
+              <item name="APTSearchEngine" type="1039202d:NonAndroidModuleNode" />
+              <item name="java" type="b5c1fe26:NonAndroidSourceTypeNode" />
             </path>
             <path>
               <item name="APTSearchEngine" type="b2602c69:ProjectViewProjectNode" />
@@ -268,7 +266,7 @@
               <item name="Root" type="cbb8eebc:String" user="Root" />
               <item name="APTSearchEngine" type="cbb8eebc:String" user="APTSearchEngine" />
               <item name="src" type="cbb8eebc:String" user="src" />
-              <item name="com/APT/SearchEngine" type="cbb8eebc:String" user="com/APT/SearchEngine" />
+              <item name="com" type="cbb8eebc:String" user="com" />
             </path>
             <path>
               <item name="Root" type="cbb8eebc:String" user="Root" />
@@ -294,6 +292,23 @@
               <item name="Crawler" type="462c0819:PsiDirectoryNode" />
 >>>>>>> Stashed changes
             </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="APTSearchEngine" type="cbb8eebc:String" user="APTSearchEngine" />
+              <item name="src" type="cbb8eebc:String" user="src" />
+              <item name="com" type="cbb8eebc:String" user="com" />
+              <item name="APT" type="cbb8eebc:String" user="APT" />
+              <item name="SearchEngine" type="cbb8eebc:String" user="SearchEngine" />
+            </path>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="APTSearchEngine" type="cbb8eebc:String" user="APTSearchEngine" />
+              <item name="src" type="cbb8eebc:String" user="src" />
+              <item name="com" type="cbb8eebc:String" user="com" />
+              <item name="APT" type="cbb8eebc:String" user="APT" />
+              <item name="SearchEngine" type="cbb8eebc:String" user="SearchEngine" />
+              <item name="Crawler" type="cbb8eebc:String" user="Crawler" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -304,22 +319,44 @@
         <subPane>
           <expand>
             <path>
-              <item name="APTSearchEngine" type="1abcf292:AndroidViewProjectNode" />
-              <item name="APTSearchEngine" type="1039202d:NonAndroidModuleNode" />
+              <item name="APTSearchEngine" type="b2602c69:ProjectViewProjectNode" />
+              <item name="APTSearchEngine" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="APTSearchEngine" type="1abcf292:AndroidViewProjectNode" />
-              <item name="APTSearchEngine" type="1039202d:NonAndroidModuleNode" />
-              <item name="java" type="b5c1fe26:NonAndroidSourceTypeNode" />
+              <item name="APTSearchEngine" type="b2602c69:ProjectViewProjectNode" />
+              <item name="APTSearchEngine" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="APTSearchEngine" type="b2602c69:ProjectViewProjectNode" />
+              <item name="APTSearchEngine" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="APTSearchEngine" type="b2602c69:ProjectViewProjectNode" />
+              <item name="APTSearchEngine" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="APT" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="APTSearchEngine" type="b2602c69:ProjectViewProjectNode" />
+              <item name="APTSearchEngine" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+              <item name="APT" type="462c0819:PsiDirectoryNode" />
+              <item name="SearchEngine" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.34827587" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
@@ -520,6 +557,15 @@
     <option name="totallyTimeSpent" value="5158000" />
 >>>>>>> Stashed changes
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="7" />
     <editor active="true" />
@@ -531,7 +577,6 @@
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296355" sideWeight="0.50292826" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -657,20 +702,16 @@
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
-        <watch expression="e.attributes" language="JAVA" />
-        <watch expression="paragraphs.text()" language="JAVA" />
-        <watch expression="paragraphs.select(&quot;q&quot;)" language="JAVA" />
-        <watch expression="document.getElementsByTag(&quot;p&quot;)" language="JAVA" />
-        <watch expression="document.getElementsByTag(&quot;q&quot;)" language="JAVA" />
-        <watch expression="document.getAllElements()" language="JAVA" />
+        <watch expression="allElements.get(i)" language="JAVA" />
+        <watch expression="document" language="JAVA" />
       </configuration>
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Crawler/Spider.java">
+    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Crawler/CrawlerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="12" lean-forward="false" selection-start-line="15" selection-start-column="12" selection-end-line="15" selection-end-column="12" />
+        <state relative-caret-position="238">
+          <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#909#928#0" expanded="true" />
@@ -685,17 +726,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Data/Data.java">
+    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Indexer/Indexer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2414">
-          <caret line="142" column="5" lean-forward="false" selection-start-line="142" selection-start-column="5" selection-end-line="142" selection-end-column="5" />
+        <state relative-caret-position="-458">
+          <caret line="138" column="87" lean-forward="true" selection-start-line="138" selection-start-column="87" selection-end-line="138" selection-end-column="87" />
+          <folding>
+            <element signature="e#14060#14061#0" expanded="true" />
+            <element signature="e#14119#14120#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Main.java">
+    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Models/WordModel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="23" lean-forward="true" selection-start-line="5" selection-start-column="23" selection-end-line="5" selection-end-column="23" />
+          <folding>
+            <element signature="e#331#332#0" expanded="true" />
+            <element signature="e#373#374#0" expanded="true" />
+            <element signature="e#404#405#0" expanded="true" />
+            <element signature="e#431#432#0" expanded="true" />
+            <element signature="e#466#467#0" expanded="true" />
+            <element signature="e#497#498#0" expanded="true" />
+            <element signature="e#527#528#0" expanded="true" />
+            <element signature="e#554#555#0" expanded="true" />
+            <element signature="e#593#594#0" expanded="true" />
+            <element signature="e#644#645#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Crawler/Spider.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
-          <caret line="17" column="83" lean-forward="false" selection-start-line="17" selection-start-column="83" selection-end-line="17" selection-end-column="83" />
+          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="32" />
           <folding />
         </state>
       </provider>
@@ -719,7 +783,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
           <caret line="17" column="83" lean-forward="false" selection-start-line="17" selection-start-column="83" selection-end-line="17" selection-end-column="83" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -742,7 +805,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="12" column="19" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="12" selection-end-column="19" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -786,7 +848,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -834,13 +895,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Crawler/Spider.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="24" lean-forward="false" selection-start-line="5" selection-start-column="24" selection-end-line="5" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Data/Data.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
@@ -852,7 +906,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
           <caret line="12" column="58" lean-forward="false" selection-start-line="11" selection-start-column="12" selection-end-line="12" selection-end-column="58" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -861,8 +914,9 @@
     <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Data/HTMLTag.java" />
     <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="17" column="84" lean-forward="false" selection-start-line="17" selection-start-column="84" selection-end-line="17" selection-end-column="84" />
+        <state relative-caret-position="136">
+          <caret line="8" column="25" lean-forward="false" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="25" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -930,27 +984,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Models/WordModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="237">
-          <caret line="15" column="12" lean-forward="false" selection-start-line="15" selection-start-column="12" selection-end-line="15" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Indexer/Indexer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Crawler/CrawlerTest.java">
+    <entry file="jar://$PROJECT_DIR$/lib/jsoup-1.11.2-sources.jar!/org/jsoup/nodes/Element.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2346">
           <caret line="147" column="5" lean-forward="false" selection-start-line="147" selection-start-column="5" selection-end-line="147" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -980,7 +1017,10 @@
     <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/RobotParser/RobotsDisallowedException.java" />
     <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/RobotParser/RobotsTxtReader.java" />
     <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Crawler/RobotParser.java" />
-    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Indexer/Indexer.java">
+    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Robotxt/RobotsDisallowedException.java" />
+    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Robotxt/RobotsParser.java" />
+    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Robotxt/RobotsTxtReader.java" />
+    <entry file="file://$PROJECT_DIR$/src/com/APT/SearchEngine/Crawler/CrawlerTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
           <caret line="10" column="22" lean-forward="false" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
@@ -996,7 +1036,16 @@
         <state relative-caret-position="221">
           <caret line="13" column="40" lean-forward="true" selection-start-line="13" selection-start-column="40" selection-end-line="13" selection-end-column="40" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#331#332#0" expanded="true" />
+            <element signature="e#373#374#0" expanded="true" />
+            <element signature="e#404#405#0" expanded="true" />
+            <element signature="e#431#432#0" expanded="true" />
+            <element signature="e#466#467#0" expanded="true" />
+            <element signature="e#497#498#0" expanded="true" />
+            <element signature="e#527#528#0" expanded="true" />
+            <element signature="e#554#555#0" expanded="true" />
+            <element signature="e#593#594#0" expanded="true" />
+            <element signature="e#644#645#0" expanded="true" />
           </folding>
         </state>
       </provider>

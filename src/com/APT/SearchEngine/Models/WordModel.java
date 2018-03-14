@@ -2,20 +2,13 @@ package com.APT.SearchEngine.Models;
 
 public class WordModel {
     private String word;
-    private int position;
     private String document;
-    private int type;
+    private float rank;
     private float frequency;
 
-    public WordModel(String word,String document,int position,int type){
+    public WordModel(String word,String document){
         this.word=word;
         this.document=document;
-        this.position=position;
-        this.type=type;
-    }
-
-    public float getFrequency() {
-        return frequency;
     }
 
     public void setFrequency(float frequency) {
@@ -26,15 +19,15 @@ public class WordModel {
         return word;
     }
 
-    public int getPosition() {
-        return position;
-    }
-
     public String getDocument() {
         return document;
     }
 
-    public int getType() {
-        return type;
+    public float getRank() {
+        return rank;
+    }
+
+    public void setRank(float rank) {
+        this.rank = 0.5f*(rank * frequency);
     }
 }
