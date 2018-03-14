@@ -16,7 +16,8 @@ public class CrawlerTest {
         }
         catch (IOException ex)
         {
-            System.out.println("lol you loser");
+            System.out.println("lol " +
+                    "you loser");
         }
     }
 }
