@@ -28,7 +28,7 @@ class Spider {
     private Set<String> newsPaperSites = Data.getNewsSite();
 
 
-    
+
     /*Constructor that takes # of threads and initializes all my variables */
     public Spider(int threadsNumber) throws IOException {
         numberOfThreads = threadsNumber;
@@ -171,6 +171,8 @@ class Spider {
             synchronized (pagesVisitedMemory)
             {
                 writeURL(URL,pagesVisitedMemory);
+
+                //insert into db that is was visited
             }
 
 
@@ -212,6 +214,25 @@ class Spider {
             if(!currentURL.equals("")) {
                 crawl(currentURL);
             }
+        }
+
+        //Delete the three files
+        try {
+            PrintWriter writer = new PrintWriter(pagesToVisitMemory);
+            writer.print("");
+            writer.close();
+
+            PrintWriter writer2 = new PrintWriter(currentPagesMemory);
+            writer2.print("");
+            writer2.close();
+
+            PrintWriter writer3 = new PrintWriter(pagesVisitedMemory);
+            writer3.print("");
+            writer3.close();
+        }
+        catch (FileNotFoundException ex)
+        {
+            ex.printStackTrace();
         }
     }
 
