@@ -217,7 +217,7 @@ class Spider {
         {
             String currentURL = nextUrl();
             System.out.println(currentURL);
-            if(!currentURL.equals("")) {
+            if(!currentURL.equals("") && !currentURL.startsWith("mailto")) {
                 crawl(currentURL);
             }
         }
