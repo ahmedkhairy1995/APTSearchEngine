@@ -27,7 +27,8 @@ public class Data {
             "www.telegraph.co.uk",
             "www.theguardian.com",
             "abcnews.go.com",
-            "forbes.com").collect(Collectors.toSet());
+            "forbes.com",
+            "Stackoverflow.com").collect(Collectors.toSet());
 
 
     private static Set<String> stopWords = Stream.of("i" ,
