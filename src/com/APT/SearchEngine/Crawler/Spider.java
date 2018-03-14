@@ -173,6 +173,7 @@ class Spider {
                 writeURL(URL,pagesVisitedMemory);
 
                 //insert into db that is was visited
+                insertIntoDB(URL,htmlDocument.toString());
             }
 
 
@@ -183,6 +184,11 @@ class Spider {
 
     }
 
+    private void insertIntoDB(String URL,String Doc)
+    {
+        //call timons function twice
+
+    }
     private void writeURL(String URL,String file) {
         try {
             // Assume default encoding.
