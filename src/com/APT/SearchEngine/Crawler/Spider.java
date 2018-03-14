@@ -11,7 +11,7 @@ import org.jsoup.select.Elements;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
+import com.APT.SearchEngine.Database.*;
 
 class Spider {
     private int maxPages = 5000;
@@ -24,15 +24,15 @@ class Spider {
     private String pagesVisitedMemory = "Done.txt";
     private String pagesToVisitMemory = "Seeds.txt";
     private ArrayList<String> DisAllowedPath = new ArrayList<>();
-    private ArrayList<Pair<String,Long>> Database = new ArrayList<Pair<String,Long>>();
+    private ArrayList<Pair<String,Long>> DatabaseArray = new ArrayList<Pair<String,Long>>();
     private Set<String> newsPaperSites = Data.getNewsSite();
+    private Database databaseConnection = Database.GetInstance() ;
 
 
 
     /*Constructor that takes # of threads and initializes all my variables */
     public Spider(int threadsNumber) throws IOException {
         numberOfThreads = threadsNumber;
-
         //read from the files over here
 
         //Reading CurrentPages
@@ -187,6 +187,15 @@ class Spider {
     private void insertIntoDB(String URL,String Doc)
     {
         //call timons function twice
+        try{
+            databaseConnection.InsertAndUpdateRow("Crawler",URL,"Document","text",Doc);
+            databaseConnection.InsertAndUpdateRow("Crawler",URL,"Document","Indexed","false");
+        }
+        catch(IOException ex)
+        {
+            ex.printStackTrace();
+        }
+
 
     }
     private void writeURL(String URL,String file) {
@@ -263,12 +272,12 @@ class Spider {
 
         //Fill the table of the database
 
-        //Database = GetAllTheStuff();
+        //DatabaseArray = GetAllTheStuff();
         long millis = System.currentTimeMillis() % 1000;
         long oneDay = TimeUnit.DAYS.toMillis(1);
         long fourDays = TimeUnit.DAYS.toMillis(4);
         boolean notVisited = false;
-        for (Pair<String,Long> item : Database) {
+        for (Pair<String,Long> item : DatabaseArray) {
 
             notVisited = false;
             if(isNewsPaper(item.getKey()))

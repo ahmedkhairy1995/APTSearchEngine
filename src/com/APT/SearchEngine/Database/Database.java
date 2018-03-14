@@ -17,7 +17,7 @@ public class Database {
 
     private Database()
     {
-        Init();
+
     }
 
     public static Database GetInstance()
@@ -25,6 +25,7 @@ public class Database {
         if (DatabaseConnection == null)
         {
             DatabaseConnection = new Database();
+            Init();
         }
         return DatabaseConnection;
     }
@@ -44,7 +45,7 @@ public class Database {
         }
     }
 
-    public static  void Close()
+    public void Close()
     {
         try {
             if(admin != null)
@@ -57,7 +58,7 @@ public class Database {
 
     }
 
-    public static void createTable(String Name,String[] cols) throws IOException
+    public void createTable(String Name,String[] cols) throws IOException
     {
         TableName tableName = TableName.valueOf(Name);
         if(admin.tableExists(tableName)){
@@ -75,7 +76,7 @@ public class Database {
             }
     }
 
-    public static void deleteTable(String tableName) throws IOException
+    public void deleteTable(String tableName) throws IOException
     {
         TableName tn = TableName.valueOf(tableName);
         if (admin.tableExists(tn))
@@ -85,7 +86,7 @@ public class Database {
         }
     }
 
-    public static void listTables() throws IOException
+    public void listTables() throws IOException
     {
         HTableDescriptor hTableDescriptors[] = admin.listTables();
         for(HTableDescriptor hTableDescriptor :hTableDescriptors)
@@ -94,7 +95,7 @@ public class Database {
         }
     }
 
-    public static void InsertAndUpdateRow(String tableName,String rowkey,String colFamily,String col,String val) throws IOException
+    public void InsertAndUpdateRow(String tableName,String rowkey,String colFamily,String col,String val) throws IOException
     {
         Table table = connection.getTable(TableName.valueOf(tableName));
         Put put = new Put(Bytes.toBytes(rowkey));
@@ -107,7 +108,7 @@ public class Database {
         table.close();
     }
 
-    public static void DeleteRow(String tableName,String rowkey,String colFamily,String col) throws IOException
+    public void DeleteRow(String tableName,String rowkey,String colFamily,String col) throws IOException
     {
         Table table = connection.getTable(TableName.valueOf(tableName));
         Delete delete = new Delete(Bytes.toBytes(rowkey));
@@ -120,7 +121,7 @@ public class Database {
         table.close();
     }
 
-    public static void GetData(String tableName,String rowkey,String colFamily,String col)throws  IOException
+    public void GetData(String tableName,String rowkey,String colFamily,String col)throws  IOException
     {
         Table table = connection.getTable(TableName.valueOf(tableName));
         Get get = new Get(Bytes.toBytes(rowkey));
@@ -153,7 +154,7 @@ public class Database {
         return output;
     }
 
-    public static void ShowCell(Result result)
+    public void ShowCell(Result result)
     {
         Cell[] cells = result.rawCells();
         for(Cell cell:cells)
@@ -165,7 +166,7 @@ public class Database {
             System.out.println("value:"+new String(CellUtil.cloneValue(cell))+" ");
         }
     }
-    public static void ScanData(String tableName,String startRow,String stopRow)throws IOException
+    public void ScanData(String tableName,String startRow,String stopRow)throws IOException
     {
         Table table = connection.getTable(TableName.valueOf(tableName));
         Scan scan = new Scan();
