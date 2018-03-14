@@ -13,8 +13,8 @@ import java.util.*;
 
 public class Indexer {
     private static Indexer indexer=null;
-//    private String[] documents=(String[]) Data.getMyDocuments().keySet().toArray();
-    private String[] documents={"https://www.google.com.eg/?gfe_rd=cr&dcr=1&ei=2NaiWpTxL_CZX9-vrDA"};
+    //    private String[] documents=(String[]) Data.getMyDocuments().keySet().toArray();
+    private String[] documents={"https://www.udemy.com/"};
     private int numThreads;
 
     private Indexer(){
@@ -38,24 +38,28 @@ public class Indexer {
                 Stack<String> myStack;
                 ArrayList<WordModel> processedWords;
                 HashMap<String,Integer> wordCount;
+                HashMap<String,Integer> wordRank;
                 @Override
                 public void run() {
                     porterStemmer=new PorterStemmer();
-                    myStack=new Stack<String>();
+                    myStack=new Stack<>();
                     processedWords=new ArrayList<>();
-                    wordCount=new HashMap<>();
-                    index(offset,porterStemmer,myStack,processedWords,wordCount);
+                    wordCount = new HashMap<>();
+                    wordRank = new HashMap<>();
+                    index(offset,porterStemmer,myStack,processedWords,wordCount,wordRank);
                 }
             }).start();
         }
     }
 
-    private void index(int index,PorterStemmer porterStemmer,Stack<String> myStack,ArrayList<WordModel> processedWords,HashMap<String,Integer> wordCount){
+    private void index(int index,PorterStemmer porterStemmer,Stack<String> myStack,ArrayList<WordModel> processedWords,HashMap<String,Integer> wordCount,HashMap<String,Integer> wordRank){
         if(index>=documents.length)
             return;
         try{
             //Get the whole document in HTML Format
             Document document = Jsoup.connect(documents[index]).get();
+
+            //Delete all previous entries for that specific link
 
             //Get all elements as a hierarchy in HTML Format
             Elements allElements=document.getAllElements();
@@ -71,11 +75,14 @@ public class Indexer {
 
                 //HTMLTag has content to insert into DB
                 if (innerHTML.length()!=0){
+
                     //Get the tag of this element
                     Tag tag=allElements.get(i).tag();
 
                     //Skip some tags
                     if(isUnneccessaryTag(tag)) continue;
+
+                    //Get tag ranking
                     int type=getTagRank(tag);
 
                     //Get the element as an array of strings
@@ -85,13 +92,10 @@ public class Indexer {
                         //Get a word from my items
                         String word=items.get(j);
 
-                        //if it's not a word or number
-                        if(!(word.matches("[A-Za-z0-9ٍ]+"))) continue;
-
                         //This is needed to avoid inserting inner attributes as words
                         int occurrence;
                         if(j==0){
-                            occurrence=getIndexOfClosingTagForFirstOpeningTag(word,items);
+                            occurrence=getIndexForClosingTag(word,items,0);
                             if(occurrence!=-1){
                                 items.remove(occurrence);
                                 j=occurrence-1;
@@ -100,24 +104,40 @@ public class Indexer {
                         }
                         else{
                             //This is needed to skip inner tags
-                            occurrence=isInnerOpeningTag(word,items);
+                            occurrence=isInnerOpeningTag(word,items,j);
                             if(occurrence!=-1){
                                 j = occurrence;
                                 continue;
                             }
                         }
 
-                        //Add this word to my list to save it to my Database
-                        String stemmedWord=porterStemmer.stem(word);
-                        WordModel processedWord=new WordModel(stemmedWord,documents[index],(i+2)-allElements.size(),type);
-                        processedWords.add(processedWord);
-                        System.out.print(processedWord.getWord()+"\n");
+                        //if it's not a word or number
+                        if(!(word.matches("[A-Za-z0-9ٍ][A-Za-z0-9.]*"))) continue;
 
-                        //Update count of word in page
-                        if(!wordCount.containsKey(stemmedWord))
+                        //If a word ends with a dot like => "using facebook."
+                        if(word.endsWith(".")) word = word.substring(0, word.length() - 1);
+
+                        //convert word to lowercase
+                        word = word.toLowerCase();
+
+                        //stem word using PorterStemmer
+                        String stemmedWord=porterStemmer.stem(word);
+
+                        //Word did not exist before
+                        if(!wordCount.containsKey(stemmedWord)){
                             wordCount.put(stemmedWord,1);
-                        else
+                            wordRank.put(stemmedWord,type);
+
+                            WordModel processedWord=new WordModel(stemmedWord,documents[index]);
+
+                            //Add this word to my list to save it to my Database
+                            processedWords.add(processedWord);
+                        }
+                        //Word is existing
+                        else{
                             wordCount.computeIfPresent(stemmedWord, (k, v) -> v + 1);
+                            wordRank.computeIfPresent(stemmedWord, (k, v) -> v + type);
+                        }
                     }
                 }
             }
@@ -127,11 +147,14 @@ public class Indexer {
             for (WordModel processedWord : processedWords) {
                 try {
                     //Calculating word frequency
-                    float wordFrequency = (float) wordCount.get(processedWord.getWord()) / totalNumWords;
+                    int countOfWord = wordCount.get(processedWord.getWord());
+                    float wordFrequency = ((float) countOfWord) / totalNumWords;
+
+                    //Set both word's frequency and ranking (both values are <=1)
                     processedWord.setFrequency(wordFrequency);
+                    processedWord.setRank(wordRank.get(processedWord.getWord())/(countOfWord*50));
 
-
-
+                    System.out.println(processedWord.getWord());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -149,18 +172,34 @@ public class Indexer {
         wordCount.clear();
 
         //Recursive call
-        index(index+numThreads,porterStemmer,myStack,processedWords,wordCount);
+        index(index+numThreads,porterStemmer,myStack,processedWords,wordCount,wordRank);
     }
 
-    private int getIndexOfClosingTagForFirstOpeningTag(String word, List<String> items){
-        //This is case for : <p color="red">
+    private int getIndexForClosingTag(String word, List<String> items,int startingPos){
+        //This is case for : <p color="red" >
         int occurrence=-1;
-        if(word.startsWith("<") && !word.endsWith(">"))
-            occurrence=items.indexOf(">");
+
+        ArrayList<String> mySubList=new ArrayList<>(items.subList(startingPos,items.size()));
+
+        if (word.startsWith("<") && !word.endsWith(">")){
+            //Get closing tag position for tags like <img> for example
+            occurrence=mySubList.indexOf(">") + startingPos;
+
+            if (occurrence==-1){
+                for(int i=startingPos;i<items.size();i++){
+                    String string = items.get(i);
+                    if(string.endsWith(">") && !string.startsWith("<") && string.length()>1)
+                        occurrence=i;
+                }
+            }
+        }
         return occurrence;
     }
 
     private List<String> purifyElements(String text){
+        //convert text to lowercase
+        text=text.toLowerCase();
+
         //Here we're modifying the string to remove HTML entities
         text = text.replace("&", " &");
         text = text.replace(";", "; ");
@@ -171,9 +210,6 @@ public class Indexer {
         //First we need to remove all HTML entities
         purifiedList.removeIf((String word) -> (word.startsWith("&") && word.endsWith(";")));
 
-        //Second we need to remove all stop words
-        purifiedList.removeIf(this::isAStopWord);
-
         //rejoin again all array into the string
         text=String.join(" ",purifiedList);
 
@@ -182,7 +218,6 @@ public class Indexer {
         text = text.replace("#"," ");
         text = text.replace("@"," ");
         text = text.replace("?", " ");
-        text = text.replace(".", " ");
         text = text.replace("(", " ");
         text = text.replace(")", " ");
         text = text.replace("{", " ");
@@ -194,7 +229,6 @@ public class Indexer {
         text = text.replace("|", " ");
         text = text.replace("*", " ");
         text = text.replace("+", " ");
-        text = text.replace("-", " ");
         text = text.replace("=", " ");
         text = text.replace("%", " ");
         text = text.replace("~", " ");
@@ -215,12 +249,19 @@ public class Indexer {
 
         //This is needed to remove the latest closing parent tag
         purifiedList.remove(purifiedList.size()-1);
+        //This is needed to remove the latest closing parent tag
+
+        //This is needed to remove empty strings
+        purifiedList.removeIf((String word)->word.length()==0);
+
+        //Second we need to remove all stop words
+        purifiedList.removeIf(this::isAStopWord);
 
         //return list
         return purifiedList;
     }
 
-    private int isInnerOpeningTag(String word,List<String> items){
+    private int isInnerOpeningTag(String word,List<String> items,int startingPos){
         //We have two cases of inner tags
         //1st Case is : <i> ahmed </i> , words will be <i> ahmed </i>
         //2nd Case is : <a src="" href=""> ahmed </a> , words will be <a src href > ahmed </a>
@@ -240,11 +281,13 @@ public class Indexer {
         //get index for the final closing tag
         occurrence=items.lastIndexOf("</"+tagName+">");
 
+        if(occurrence==-1)
+            occurrence=getIndexForClosingTag(word,items,startingPos);
         return occurrence;
     }
 
     private boolean isUnneccessaryTag(Tag tag){
-        return (tag.getName().equals("head") || tag.getName().equals("html")|| tag.getName().equals("div")|| tag.getName().equals("body")|| tag.getName().equals("style")|| tag.getName().equals("script"));
+        return (tag.getName().equals("head") ||tag.getName().equals("require-auth")||tag.getName().equals("nav")|| tag.getName().equals("input")|| tag.getName().equals("footer")|| tag.getName().equals("form") || tag.getName().equals("html")|| tag.getName().equals("div")|| tag.getName().equals("body")|| tag.getName().equals("style")|| tag.getName().equals("script"));
     }
 
     private int getTagRank(Tag tag){
@@ -356,7 +399,7 @@ public class Indexer {
             case "s":
                 rank = 0;
                 break;
-             default:
+            default:
                 rank=1;
                 break;
         }
