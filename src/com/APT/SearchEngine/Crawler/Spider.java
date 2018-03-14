@@ -156,7 +156,8 @@ class Spider {
             {
                 for(Element link: linksFound)
                 {
-                    this.pagesToVisit.add(link.absUrl("href"));
+
+                    this.pagesToVisit.add(link.absUrl("href").substring(0,link.absUrl("href").indexOf('#')));
                 }
             }
 
@@ -164,7 +165,7 @@ class Spider {
             {
                 for(Element link: linksFound)
                 {
-                    writeURL(link.absUrl("href"),pagesToVisitMemory);
+                    writeURL(link.absUrl("href").substring(0,link.absUrl("href").indexOf('#')),pagesToVisitMemory);
                 }
             }
 
@@ -221,8 +222,14 @@ class Spider {
         }
     }
 
+    public boolean ArraysAreNotEmpty()
+    {
+        return currentPages.size()!=0 && pagesToVisit.size()!=0 && pagesVisited.size()!=0;
+    }
+
+
     private void Search() {
-        while(pagesVisited.size() < maxPages)
+        while(pagesVisited.size() < maxPages && ArraysAreNotEmpty())
         {
             String currentURL = nextUrl();
             System.out.println(currentURL);
@@ -265,37 +272,48 @@ class Spider {
         }
         return false;
     }
+
+
+
+
     private void initializeFromDatabase ()
     {
         //Come here if I found no seeds in the files ( first phase of crawling is done and now we are recrawling)
 
 
         //Fill the table of the database
+        try
+        {
+            DatabaseArray = databaseConnection.getAllUrls("Crawler");
+            long millis = System.currentTimeMillis() % 1000;
+            long oneDay = TimeUnit.DAYS.toMillis(1);
+            long fourDays = TimeUnit.DAYS.toMillis(4);
+            boolean notVisited = false;
+            for (Pair<String,Long> item : DatabaseArray) {
 
-        //DatabaseArray = GetAllTheStuff();
-        long millis = System.currentTimeMillis() % 1000;
-        long oneDay = TimeUnit.DAYS.toMillis(1);
-        long fourDays = TimeUnit.DAYS.toMillis(4);
-        boolean notVisited = false;
-        for (Pair<String,Long> item : DatabaseArray) {
+                notVisited = false;
+                if(isNewsPaper(item.getKey()))
+                {
+                    if(item.getValue() - millis > oneDay )
+                    {
+                        pagesToVisit.add(item.getKey());
+                        notVisited = true;
+                    }
 
-            notVisited = false;
-            if(isNewsPaper(item.getKey()))
-            {
-                if(item.getValue() - millis > oneDay )
+                }
+                if(item.getValue() - millis > fourDays )
                 {
                     pagesToVisit.add(item.getKey());
                     notVisited = true;
                 }
-
+                if(!notVisited)
+                    pagesVisited.add(item.getKey());
             }
-            if(item.getValue() - millis > fourDays )
-            {
-                pagesToVisit.add(item.getKey());
-                notVisited = true;
-            }
-            if(!notVisited)
-                pagesVisited.add(item.getKey());
         }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
+
     }
 }

@@ -133,7 +133,7 @@ public class Database {
         table.close();
     }
 
-    public static ArrayList<Pair<String,Long>> getAllUrls(String tableName) throws IOException
+    public ArrayList<Pair<String,Long>> getAllUrls(String tableName) throws IOException
     {
 
         Table table =connection.getTable(TableName.valueOf(tableName));
