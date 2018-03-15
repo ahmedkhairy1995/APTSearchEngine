@@ -5,7 +5,7 @@ import com.APT.SearchEngine.Indexer.Indexer;
 public class Main {
     public static void main(String args[]) {
         Indexer indexer = Indexer.getInstance();
-        indexer.setNumThreads(1);
+        indexer.setNumThreads(10);
         indexer.beginIndexing();
     }
 }

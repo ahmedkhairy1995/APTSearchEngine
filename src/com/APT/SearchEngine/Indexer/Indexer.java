@@ -1,4 +1,3 @@
-
 package com.APT.SearchEngine.Indexer;
 
 import com.APT.SearchEngine.Data.Data;
@@ -10,11 +9,13 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Indexer {
     private static Indexer indexer=null;
     //    private String[] documents=(String[]) Data.getMyDocuments().keySet().toArray();
-    private String[] documents={"https://www.udemy.com/"};
+    private String[] documents={""};
     private int numThreads;
 
     private Indexer(){
@@ -35,24 +36,22 @@ public class Indexer {
             final int offset=i;
             new Thread(new Runnable() {
                 PorterStemmer porterStemmer;
-                Stack<String> myStack;
                 ArrayList<WordModel> processedWords;
                 HashMap<String,Integer> wordCount;
                 HashMap<String,Integer> wordRank;
                 @Override
                 public void run() {
                     porterStemmer=new PorterStemmer();
-                    myStack=new Stack<>();
-                    processedWords=new ArrayList<>();
+                    processedWords = new ArrayList<>();
                     wordCount = new HashMap<>();
                     wordRank = new HashMap<>();
-                    index(offset,porterStemmer,myStack,processedWords,wordCount,wordRank);
+                    index(offset,porterStemmer,processedWords,wordCount,wordRank);
                 }
             }).start();
         }
     }
 
-    private void index(int index,PorterStemmer porterStemmer,Stack<String> myStack,ArrayList<WordModel> processedWords,HashMap<String,Integer> wordCount,HashMap<String,Integer> wordRank){
+    private void index(int index,PorterStemmer porterStemmer,ArrayList<WordModel> processedWords,HashMap<String,Integer> wordCount,HashMap<String,Integer> wordRank){
         if(index>=documents.length)
             return;
         try{
@@ -114,14 +113,16 @@ public class Indexer {
                         //if it's not a word or number
                         if(!(word.matches("[A-Za-z0-9ٍ][A-Za-z0-9.]*"))) continue;
 
-                        //If a word ends with a dot like => "using facebook."
-                        if(word.endsWith(".")) word = word.substring(0, word.length() - 1);
+                        word = removeNonNecessaryPeriods(word);
 
                         //convert word to lowercase
                         word = word.toLowerCase();
 
+                        //Re-Checking if it's a stop word
+                        if(isAStopWord(word)) continue;
+
                         //stem word using PorterStemmer
-                        String stemmedWord=porterStemmer.stem(word);
+                        String stemmedWord = porterStemmer.stem(word);
 
                         //Word did not exist before
                         if(!wordCount.containsKey(stemmedWord)){
@@ -167,12 +168,12 @@ public class Indexer {
         if((index+numThreads)>=documents.length) return;
 
         //Clear all data structures for the next document
-        myStack.clear();
         processedWords.clear();
         wordCount.clear();
+        wordRank.clear();
 
         //Recursive call
-        index(index+numThreads,porterStemmer,myStack,processedWords,wordCount,wordRank);
+        index(index+numThreads,porterStemmer,processedWords,wordCount,wordRank);
     }
 
     private int getIndexForClosingTag(String word, List<String> items,int startingPos){
@@ -287,7 +288,7 @@ public class Indexer {
     }
 
     private boolean isUnneccessaryTag(Tag tag){
-        return (tag.getName().equals("head") ||tag.getName().equals("require-auth")||tag.getName().equals("nav")|| tag.getName().equals("input")|| tag.getName().equals("footer")|| tag.getName().equals("form") || tag.getName().equals("html")|| tag.getName().equals("div")|| tag.getName().equals("body")|| tag.getName().equals("style")|| tag.getName().equals("script"));
+        return (tag.getName().equals("head") ||tag.getName().equals("require-auth")||tag.getName().equals("noscript")||tag.getName().equals("nav")|| tag.getName().equals("input")|| tag.getName().equals("footer")|| tag.getName().equals("form") || tag.getName().equals("html")|| tag.getName().equals("div")|| tag.getName().equals("body")|| tag.getName().equals("style")|| tag.getName().equals("script"));
     }
 
     private int getTagRank(Tag tag){
@@ -415,5 +416,17 @@ public class Indexer {
         Element mainElement=elements.get(0);
         ArrayList<String> innerHTML= new ArrayList<>(Arrays.asList(mainElement.text().split(" ")));
         return innerHTML.size();
+    }
+
+    private String removeNonNecessaryPeriods(String word){
+        Pattern pattern = Pattern.compile("[.].+");
+
+        Matcher matcher = pattern.matcher(word);
+
+        word=matcher.replaceAll(".");
+
+        //If a word ends with a dot like => "using facebook."
+        if(word.endsWith(".")) word = word.substring(0, word.length() - 1);
+        return word;
     }
 }

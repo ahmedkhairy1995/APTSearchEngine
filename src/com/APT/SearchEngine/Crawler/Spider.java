@@ -111,12 +111,7 @@ class Spider {
             maxPages = maxPages + 1000;
         }
         for(int i=0; i<numberOfThreads;i++) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Search();
-                }
-            }).start();
+            new Thread(this::Search).start();
         }
     }
 
