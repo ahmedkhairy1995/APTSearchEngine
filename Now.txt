@@ -245,3 +245,4 @@ https://en.wikipedia.org/wiki/Fictitious_force
 https://en.wikipedia.org/wiki/Friction
 https://en.wikipedia.org/wiki/Harmonic_oscillator
 https://en.wikipedia.org/wiki/Non-inertial_reference_frame
+https://en.wikipedia.org/wiki/Non-inertial_reference_frame

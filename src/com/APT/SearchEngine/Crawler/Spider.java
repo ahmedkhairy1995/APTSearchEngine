@@ -99,7 +99,7 @@ class Spider {
         if (currentPages.size() == 0 && pagesVisited.size() == 0 && pagesToVisit.size() == 0) {
             //we are about to recrawl
             initializeFromDatabase();
-            maxPages = maxPages + 1000;
+            maxPages = DatabaseArray.size() + 1000;
         }
 
         for (int i = 0; i < numberOfThreads; i++) {
@@ -293,7 +293,7 @@ class Spider {
 
 
     private void Search(boolean firstTime) {
-        while(pagesVisited.size() < maxPages - 3000 )
+        while(pagesVisited.size() < maxPages  )
         {
             String currentURL = nextUrl(firstTime);
             System.out.println(currentURL);
