@@ -31,7 +31,7 @@ class Spider {
     private ArrayList<Pair<String,Long>> DatabaseArray = new ArrayList<Pair<String,Long>>();
     private Set<String> newsPaperSites = Data.getNewsSite();
     private Database databaseConnection = Database.GetInstance() ;
-
+    private ArrayList<Thread> threads=new ArrayList<>();
 
 
     /*Constructor that takes # of threads and initializes all my variables */
@@ -44,21 +44,17 @@ class Spider {
         try {
             FileReader fileReader = new FileReader(currentPagesMemory);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while( (bufferLine = bufferedReader.readLine()) != null)
-            {
+            while ((bufferLine = bufferedReader.readLine()) != null) {
                 currentPages.add(bufferLine);
             }
             bufferedReader.close();
-        }
-        catch (FileNotFoundException ex){
+        } catch (FileNotFoundException ex) {
             System.out.println("Unable to open file '" + currentPagesMemory + "'");
 
             File f = new File(currentPagesMemory);
             f.createNewFile();
-        }
-        catch (IOException ex)
-        {
-            System.out.println("Unable to read from file '" + currentPagesMemory +"'");
+        } catch (IOException ex) {
+            System.out.println("Unable to read from file '" + currentPagesMemory + "'");
         }
 
 
@@ -66,64 +62,70 @@ class Spider {
         try {
             FileReader fileReader = new FileReader(pagesVisitedMemory);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while( (bufferLine = bufferedReader.readLine()) != null)
-            {
+            while ((bufferLine = bufferedReader.readLine()) != null) {
                 pagesVisited.add(bufferLine);
             }
             bufferedReader.close();
-        }
-        catch (FileNotFoundException ex){
+        } catch (FileNotFoundException ex) {
             System.out.println("Unable to open file '" + pagesVisitedMemory + "'");
 
             File f = new File(pagesVisitedMemory);
             f.createNewFile();
-        }
-        catch (IOException ex)
-        {
-            System.out.println("Unable to read from file '" + pagesVisitedMemory +"'");
+        } catch (IOException ex) {
+            System.out.println("Unable to read from file '" + pagesVisitedMemory + "'");
         }
 
         //Reading Pages that we need to visit
         try {
             FileReader fileReader = new FileReader(pagesToVisitMemory);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while( (bufferLine = bufferedReader.readLine()) != null)
-            {
+            while ((bufferLine = bufferedReader.readLine()) != null) {
                 System.out.println(bufferLine);
                 pagesToVisit.add(bufferLine);
             }
             bufferedReader.close();
-        }
-        catch (FileNotFoundException ex){
+        } catch (FileNotFoundException ex) {
             System.out.println("Unable to open file '" + pagesToVisitMemory + "'");
 
             File f = new File(pagesToVisitMemory);
             f.createNewFile();
-        }
-        catch (IOException ex)
-        {
-            System.out.println("Unable to read from file '" + pagesToVisitMemory +"'");
+        } catch (IOException ex) {
+            System.out.println("Unable to read from file '" + pagesToVisitMemory + "'");
         }
 
         currentPages.removeAll(pagesVisited);
 
 
-        if(currentPages.size()==0 && pagesVisited.size() ==0 && pagesToVisit.size()==0)
-        {
+        if (currentPages.size() == 0 && pagesVisited.size() == 0 && pagesToVisit.size() == 0) {
             //we are about to recrawl
             initializeFromDatabase();
             maxPages = maxPages + 1000;
         }
 
-        for(int i=0; i<numberOfThreads;i++) {
-            new Thread(new Runnable() {
+        for (int i = 0; i < numberOfThreads; i++) {
+            threads.add(new Thread(new Runnable() {
                 @Override
                 public void run() {
                     Search(true);
                 }
-            }).start();
+            }));
         }
+
+        for (Thread thread : threads)
+            thread.start();
+
+        try {
+            for (Thread thread : threads)
+                thread.join();
+
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+        databaseConnection.Close();
     }
+
+
+
 
     /*Function that handles many threads trying to get next URL to access*/
     private String nextUrl(boolean firstTime) {
@@ -171,10 +173,19 @@ class Spider {
     {
         try{
             String temp;
+            Connection.Response response = Jsoup
+                    .connect(URL)
+                    .method(Connection.Method.POST)
+                    .followRedirects(false)
+                    .execute();
+            URL = response.header("Location");
+            if(pagesVisited.contains(URL))
+                return;
             Connection connection = Jsoup.connect(URL);
             Document htmlDocument = connection.get();
             Elements linksFound = htmlDocument.select("a[href]");
 
+            //Check for the robots.txt over here :)
             //Lock the next part to avoid racing conditions
             synchronized (pagesToVisit)
             {
