@@ -9,11 +9,15 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import com.APT.SearchEngine.Database.*;
 
+import static java.lang.Thread.sleep;
+
 class Spider {
+
     private int maxPages = 5000;
     private Set<String> pagesVisited = Data.getDocuments();
     private Set<String> currentPages = new HashSet<>();
@@ -110,26 +114,45 @@ class Spider {
             initializeFromDatabase();
             maxPages = maxPages + 1000;
         }
+
         for(int i=0; i<numberOfThreads;i++) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Search();
+                    Search(true);
                 }
             }).start();
         }
     }
 
     /*Function that handles many threads trying to get next URL to access*/
-    private String nextUrl() {
+    private String nextUrl(boolean firstTime) {
         String next;
         if(pagesToVisit.size()!=0) {
-            synchronized (pagesToVisit) {
-                do {
-                    next = this.pagesToVisit.remove(0);
-                } while (pagesVisited.contains(next));
-                pagesVisited.add(next);
+            if(firstTime)
+            {
+                synchronized (currentPages)
+                {
+                    if(currentPages.size()!=0)
+                    {
+
+                        next = currentPages.iterator().next();
+                        currentPages.remove(next);
+                        pagesVisited.add(next);
+                        return next;
+                    }
+                }
             }
+
+                synchronized (pagesToVisit)
+                {
+                    do {
+                        next = this.pagesToVisit.remove(0);
+                    } while (pagesVisited.contains(next));
+                    pagesVisited.add(next);
+                }
+
+
 
             synchronized (currentPages) {
                 this.currentPages.add(next);
@@ -144,9 +167,10 @@ class Spider {
 
     //Given a URL, this function will return all the links inside this webpage
     //Recheck for adding urls to files while working
-    private void crawl(String URL)
+    private void crawl(String URL,int NumberOfTrials)
     {
         try{
+            String temp;
             Connection connection = Jsoup.connect(URL);
             Document htmlDocument = connection.get();
             Elements linksFound = htmlDocument.select("a[href]");
@@ -156,8 +180,14 @@ class Spider {
             {
                 for(Element link: linksFound)
                 {
-
-                    this.pagesToVisit.add(link.absUrl("href").substring(0,link.absUrl("href").indexOf('#')));
+                    //remove hash tags
+                    if(link.absUrl("href").indexOf('#') != -1)
+                    {
+                        continue;
+                    }
+                    else
+                        temp = link.absUrl("href");
+                    this.pagesToVisit.add(temp);
                 }
             }
 
@@ -165,7 +195,15 @@ class Spider {
             {
                 for(Element link: linksFound)
                 {
-                    writeURL(link.absUrl("href").substring(0,link.absUrl("href").indexOf('#')),pagesToVisitMemory);
+                    //remove hash tags
+                    if(link.absUrl("href").indexOf('#') != -1)
+                    {
+                        continue;
+                    }
+                    else
+                        temp = link.absUrl("href");
+
+                    writeURL(temp,pagesToVisitMemory);
                 }
             }
 
@@ -179,6 +217,20 @@ class Spider {
 
 
         }
+        catch (UnknownHostException ex)
+        {
+            ex.printStackTrace();
+            try {
+                sleep(5000);
+                if(NumberOfTrials != 3)
+                    crawl(URL,NumberOfTrials + 1);
+            }
+            catch (InterruptedException ex1)
+            {
+                ex1.printStackTrace();
+            }
+
+        }
         catch(IOException ex){
             System.out.println("Error in the http request" + ex);
         }
@@ -189,10 +241,11 @@ class Spider {
     {
         //call timons function twice
         try{
-            databaseConnection.InsertAndUpdateRow("Crawler",URL,"Document","text",Doc);
-            databaseConnection.InsertAndUpdateRow("Crawler",URL,"Document","Indexed","false");
+          databaseConnection.InsertAndUpdateRow("Crawler",URL,"Document","text",Doc);
+          databaseConnection.InsertAndUpdateRow("Crawler",URL,"Document","Indexed","false");
+        int x=0;
         }
-        catch(IOException ex)
+        catch(Exception ex)
         {
             ex.printStackTrace();
         }
@@ -228,14 +281,26 @@ class Spider {
     }
 
 
-    private void Search() {
-        while(pagesVisited.size() < maxPages && ArraysAreNotEmpty())
+    private void Search(boolean firstTime) {
+        while(pagesVisited.size() < maxPages - 3000 )
         {
-            String currentURL = nextUrl();
+            String currentURL = nextUrl(firstTime);
             System.out.println(currentURL);
             if(!currentURL.equals("") && !currentURL.startsWith("mailto")) {
-                crawl(currentURL);
+                crawl(currentURL,0);
             }
+            if(!ArraysAreNotEmpty())
+            {
+                try
+                {
+                    sleep(5000);
+                }
+                catch(InterruptedException ex)
+                {
+                    ex.printStackTrace();
+                }
+            }
+            firstTime = false;
         }
 
         //Delete the three files
