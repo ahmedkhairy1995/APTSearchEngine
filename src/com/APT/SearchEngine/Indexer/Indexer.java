@@ -1,6 +1,7 @@
 package com.APT.SearchEngine.Indexer;
 
 import com.APT.SearchEngine.Data.Data;
+import com.APT.SearchEngine.Database.Database;
 import com.APT.SearchEngine.Models.WordModel;
 import opennlp.tools.stemmer.PorterStemmer;
 import org.jsoup.Jsoup;
@@ -8,16 +9,20 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Indexer {
+    private static ArrayList<ArrayList<String>> listOfDocuments;
     private static Indexer indexer=null;
     //    private String[] documents=(String[]) Data.getMyDocuments().keySet().toArray();
     private String[] documents={""};
     private int numThreads;
-
+    private Database databaseConnection = Database.GetInstance();
+    private ArrayList<Thread> threads = new ArrayList<>();
     private Indexer(){
     }
 
@@ -32,31 +37,54 @@ public class Indexer {
     }
 
     public void beginIndexing(){
+
+        try {
+            listOfDocuments=databaseConnection.getDocumentDetails("Crawler","Document","Indexed");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         for(int i=0;i<numThreads;i++){
             final int offset=i;
-            new Thread(new Runnable() {
+            threads.add(new Thread(new Runnable() {
                 PorterStemmer porterStemmer;
                 ArrayList<WordModel> processedWords;
                 HashMap<String,Integer> wordCount;
                 HashMap<String,Integer> wordRank;
+                int indexCounter=offset;
                 @Override
                 public void run() {
                     porterStemmer=new PorterStemmer();
                     processedWords = new ArrayList<>();
                     wordCount = new HashMap<>();
                     wordRank = new HashMap<>();
-                    index(offset,porterStemmer,processedWords,wordCount,wordRank);
+                    index(indexCounter,porterStemmer,processedWords,wordCount,wordRank);
                 }
-            }).start();
+            }));
         }
+
+        for (Thread thread : threads)
+            thread.start();
+
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        databaseConnection.Close();
     }
 
     private void index(int index,PorterStemmer porterStemmer,ArrayList<WordModel> processedWords,HashMap<String,Integer> wordCount,HashMap<String,Integer> wordRank){
-        if(index>=documents.length)
+        if(index>=listOfDocuments.size()){
+            System.out.println("+++"+index + " exiting");
             return;
+        }
         try{
             //Get the whole document in HTML Format
-            Document document = Jsoup.connect(documents[index]).get();
+//            Document document = Jsoup.connect(documents[index]).get();
+            Document document = Jsoup.parse(listOfDocuments.get(index).get(2));
 
             //Delete all previous entries for that specific link
 
@@ -79,7 +107,7 @@ public class Indexer {
                     Tag tag=allElements.get(i).tag();
 
                     //Skip some tags
-                    if(isUnneccessaryTag(tag)) continue;
+                    if(isUnneccessaryTag(tag) ) continue;
 
                     //Get tag ranking
                     int type=getTagRank(tag);
@@ -129,10 +157,12 @@ public class Indexer {
                             wordCount.put(stemmedWord,1);
                             wordRank.put(stemmedWord,type);
 
-                            WordModel processedWord=new WordModel(stemmedWord,documents[index]);
+                            WordModel processedWord=new WordModel(stemmedWord,listOfDocuments.get(index).get(0));
 
                             //Add this word to my list to save it to my Database
                             processedWords.add(processedWord);
+
+                            System.out.println(processedWord.getWord() +" "+ listOfDocuments.get(index).get(0)+" "+index);
                         }
                         //Word is existing
                         else{
@@ -155,7 +185,12 @@ public class Indexer {
                     processedWord.setFrequency(wordFrequency);
                     processedWord.setRank(wordRank.get(processedWord.getWord())/(countOfWord*50));
 
-                    System.out.println(processedWord.getWord());
+//                    synchronized (databaseConnection){
+//                        databaseConnection.InsertAndUpdateRow("InvertedIndex",
+//                                processedWord.getWord(),"Links",processedWord.getDocument(), ""+processedWord.getRank());
+//                        databaseConnection.InsertAndUpdateRow("Crawler",
+//                                processedWord.getDocument(),"Document","Indexed", "true");
+//                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -165,14 +200,14 @@ public class Indexer {
             e.printStackTrace();
         }
 
-        if((index+numThreads)>=documents.length) return;
+//        if((index+numThreads)>=listOfDocuments.size()) return;
 
         //Clear all data structures for the next document
         processedWords.clear();
         wordCount.clear();
         wordRank.clear();
 
-        //Recursive call
+
         index(index+numThreads,porterStemmer,processedWords,wordCount,wordRank);
     }
 
@@ -184,7 +219,14 @@ public class Indexer {
 
         if (word.startsWith("<") && !word.endsWith(">")){
             //Get closing tag position for tags like <img> for example
-            occurrence=mySubList.indexOf(">") + startingPos;
+            int closingTagOccurrence = mySubList.indexOf("/>");
+            int closingTagOccurrence2 = mySubList.indexOf(">");
+
+            if(closingTagOccurrence!=-1)
+                occurrence=closingTagOccurrence + startingPos;
+
+            if(closingTagOccurrence2!=-1 && occurrence==-1)
+                occurrence=mySubList.indexOf(">") + startingPos;
 
             if (occurrence==-1){
                 for(int i=startingPos;i<items.size();i++){
@@ -288,7 +330,15 @@ public class Indexer {
     }
 
     private boolean isUnneccessaryTag(Tag tag){
-        return (tag.getName().equals("head") ||tag.getName().equals("require-auth")||tag.getName().equals("noscript")||tag.getName().equals("nav")|| tag.getName().equals("input")|| tag.getName().equals("footer")|| tag.getName().equals("form") || tag.getName().equals("html")|| tag.getName().equals("div")|| tag.getName().equals("body")|| tag.getName().equals("style")|| tag.getName().equals("script"));
+        return (tag.getName().equals("head") ||
+                tag.getName().equals("require-auth")||tag.getName().equals("noscript")||
+                tag.getName().equals("nav")|| tag.getName().equals("input")||
+                tag.getName().equals("footer")|| tag.getName().equals("form") ||
+                tag.getName().equals("html")|| tag.getName().equals("div")||
+                tag.getName().equals("body")|| tag.getName().equals("style")||
+                tag.getName().equals("script") || tag.getName().equals("mstyle")
+                || tag.getName().equals("script")|| tag.getName().contains("style")||
+                tag.getName().contains("script"));
     }
 
     private int getTagRank(Tag tag){
