@@ -19,7 +19,7 @@ public class RobotParser
         public  boolean checAllowedAndkDisallowed (String urlLink ,boolean reparse) throws IOException {
             URL url = new URL(urlLink);                                  // make url object
             String host = url.getHost();                                 // get host
-            String path = url.getPath();
+            String path = "/"+url.getPath();
             if (!reparse)             /// if not asked to reparse the robot.txt
             {
                 if (CheckAllowedPatterns(host,path))
@@ -48,13 +48,15 @@ public class RobotParser
                     boolean DisAllowed =false;
                     for (int i = 0 ; i<listOfAllowAndDisallow.size();i++)
                     {
-                        pattern = Pattern.compile(":(.*)");                // get the patterns
+                        pattern = Pattern.compile(": (.*)");                // get the patterns
                         matcher = pattern.matcher(listOfAllowAndDisallow.get(i));
                         if (matcher.find())                     // if patterns were found
                         {
-                            String escaped= StringEscapeUtils.escapeJava(matcher.group(1));     // escape the pattern if needed
+                            String escaped="^"+StringEscapeUtils.escapeJava(matcher.group(1));     // escape the pattern if needed
                             escaped=escaped.replaceAll("\\*",".*");       // replace * with .* to work as regex
-                            escaped+=".*";                                   // add .* to have all the combinations
+                            if (!escaped.endsWith("$"))
+                                escaped+=".*";                                   // add .* to have all the combinations
+
                             pattern = Pattern.compile(escaped);
                             matcher = pattern.matcher(path);                 // check if the path matches one of the patterns
                             if (listOfAllowAndDisallow.get(i).startsWith("Allow"))
