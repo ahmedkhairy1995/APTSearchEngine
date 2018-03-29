@@ -1,6 +1,8 @@
 package com.APT.SearchEngine.Crawler;
 
 import com.APT.SearchEngine.Data.Data;
+import com.APT.SearchEngine.Ranker.DetailedUrl;
+import com.APT.SearchEngine.Ranker.Ranker;
 import javafx.util.Pair;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -32,11 +34,18 @@ class Spider {
     private Set<String> newsPaperSites = Data.getNewsSite();
     private Database databaseConnection = Database.GetInstance() ;
     private ArrayList<Thread> threads=new ArrayList<>();
-
+    private Ranker ranker;
 
     /*Constructor that takes # of threads and initializes all my variables */
     public Spider(int threadsNumber) throws IOException {
         numberOfThreads = threadsNumber;
+        //Reading Ranker
+
+
+        if(!readRanker())
+        {
+            ranker = new Ranker();
+        }
         //read from the files over here
 
         //Reading CurrentPages
@@ -114,13 +123,20 @@ class Spider {
         for (Thread thread : threads)
             thread.start();
 
-       /* try {
+        try {
             for (Thread thread : threads)
                 thread.join();
 
         } catch (InterruptedException ex) {
             ex.printStackTrace();
-        }*/
+        }
+
+
+        ranker.computeRank();
+        for(Map.Entry map: ranker.getUrlMap().entrySet())
+        {
+            insertRankIntoDB((DetailedUrl) map.getValue());
+        }
         databaseConnection.Close();
     }
 
@@ -196,7 +212,9 @@ class Spider {
                     else
                         temp = link.absUrl("href");
                     this.pagesToVisit.add(temp);
+                    ranker.insertURL(URL,temp);
                 }
+                updateRanker();
             }
 
             synchronized (pagesToVisitMemory)
@@ -260,6 +278,23 @@ class Spider {
 
 
     }
+
+    private void insertRankIntoDB(DetailedUrl target)
+    {
+        //call timons function twice
+        try{
+            databaseConnection.InsertAndUpdateRow("Crawler",target.getName(),"Document","Popularity",Double.toString(target.getRank()));
+
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+
+    }
+
+
     private void writeURL(String URL,String file) {
         try {
             // Assume default encoding.
@@ -388,5 +423,35 @@ class Spider {
             ex.printStackTrace();
         }
 
+    }
+
+    private void updateRanker()
+    {
+        try(
+                FileOutputStream fout = new FileOutputStream("ranker.ser", false);
+                ObjectOutputStream oos = new ObjectOutputStream(fout);
+        ){
+            oos.writeObject(ranker);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private boolean readRanker()
+    {
+        ObjectInputStream objectinputstream = null;
+        try {
+            FileInputStream streamIn = new FileInputStream("ranker.ser");
+            objectinputstream = new ObjectInputStream(streamIn);
+            ranker = (Ranker) objectinputstream.readObject();
+                if(ranker != null){
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e) {
+            e.printStackTrace();
+        }
+     return false;
     }
 }
