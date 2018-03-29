@@ -6,8 +6,6 @@ import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.filter.*;
-import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
-
 import javax.naming.Name;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -119,10 +117,24 @@ public class Database {
         //delete.addFamily(Bytes.toBytes(colFamily));
         //delete.addColumn(Bytes.toBytes(colFamily),Bytes.toBytes(col));
         table.delete(delete);
-       /* List<Delete> deleteList = new ArrayList<Delete>();
-        deleteList.add(delete);
-        table.delete(deleteList);*/
         table.close();
+    }
+
+    public void BulkDelete(String tableName,ArrayList<String> rowkey,String colFamily,String col) throws IOException
+    {
+        Table table = connection.getTable(TableName.valueOf(tableName));
+        Delete delete;
+        ArrayList<Delete> deleteList = new ArrayList<Delete>();
+        for (int i =0; i<rowkey.size();i++)
+        {
+            delete = new Delete(Bytes.toBytes(rowkey.get(i)));
+            delete.addFamily(Bytes.toBytes(colFamily));
+            delete.addColumn(Bytes.toBytes(colFamily),Bytes.toBytes(col));
+            deleteList.add(delete);
+        }
+        table.delete(deleteList);
+        table.close();
+
     }
 
     public void GetData(String tableName,String rowkey,String colFamily,String col)throws  IOException
@@ -135,6 +147,27 @@ public class Database {
 
         ShowCell(result);
         table.close();
+    }
+
+    public ArrayList<String> getAllLinkWords (String tableName,String columnFamily, String columnName) throws IOException
+    {
+        Table table = connection.getTable(TableName.valueOf(tableName));
+        Scan scan = new Scan();
+        scan.addColumn(Bytes.toBytes(columnFamily),Bytes.toBytes(columnName));
+        ResultScanner resultScanner = table.getScanner(scan);
+        Cell[] cells;
+        ArrayList<String> output = new ArrayList<>();
+        String word;
+        for (Result result : resultScanner)
+        {
+            cells = result.rawCells();
+            for (Cell cell:cells)
+            {
+                word = new String (CellUtil.cloneRow(cell));
+                output.add(word);
+            }
+        }
+        return output;
     }
 
     public ArrayList<Pair<String,Long>> getAllUrls(String tableName,String columnFamily ,String columnName) throws IOException
@@ -165,9 +198,9 @@ public class Database {
         Scan scan = new Scan();
         SingleColumnValueFilter filter = new SingleColumnValueFilter(
                 Bytes.toBytes(columnFamily),
-              Bytes.toBytes(columnName),
-             CompareFilter.CompareOp.EQUAL,
-            Bytes.toBytes("false")
+                Bytes.toBytes(columnName),
+                CompareFilter.CompareOp.EQUAL,
+                Bytes.toBytes("false")
         );
         scan.setFilter(filter);
         ResultScanner resultScanner = table.getScanner(scan);
@@ -185,7 +218,7 @@ public class Database {
             }
             collectionOfRows.add(row);
         }
-    return collectionOfRows;
+        return collectionOfRows;
     }
 
     public void ShowCell(Result result)

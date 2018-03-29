@@ -238,10 +238,10 @@ class Spider {
     }
 
     private void insertIntoDB(String URL,String Doc)
-    {
+   {
         //call timons function twice
         try{
-          databaseConnection.InsertAndUpdateRow("Crawler",URL,"Document","text",Doc);
+            databaseConnection.InsertAndUpdateRow("Crawler",URL,"Document","text",Doc);
           databaseConnection.InsertAndUpdateRow("Crawler",URL,"Document","Indexed","false");
         int x=0;
         }
@@ -249,7 +249,6 @@ class Spider {
         {
             ex.printStackTrace();
         }
-
 
     }
     private void writeURL(String URL,String file) {
@@ -354,15 +353,15 @@ class Spider {
             long oneDay = TimeUnit.DAYS.toMillis(1);
             long fourDays = TimeUnit.DAYS.toMillis(4);
             boolean notVisited = false;
-            for (Pair<String,Long> item : DatabaseArray) {
+           for (Pair<String,Long> item : DatabaseArray) {
 
                 notVisited = false;
                 if(isNewsPaper(item.getKey()))
                 {
                     if(item.getValue() - millis > oneDay )
                     {
-                        pagesToVisit.add(item.getKey());
-                        notVisited = true;
+                       pagesToVisit.add(item.getKey());
+                     notVisited = true;
                     }
 
                 }

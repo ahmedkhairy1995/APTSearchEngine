@@ -1,33 +1,48 @@
 package com.APT.SearchEngine.Models;
 
 public class WordModel {
-    private String word;
+    private String originalWord;
+    private String stemmedWord;
     private String document;
-    private float rank;
-    private float frequency;
+    private double rank;
+    private double frequency;
+    private String positions;
 
-    public WordModel(String word,String document){
-        this.word=word;
+    public WordModel(String originalWord,String stemmedWord,String document){
+        this.originalWord = originalWord;
+        this.stemmedWord = stemmedWord;
         this.document=document;
     }
 
-    public void setFrequency(float frequency) {
+    public void setPositions(String positions) {
+        this.positions = positions;
+    }
+
+    public String getPositions() {
+        return positions;
+    }
+
+    public void setFrequency(double frequency) {
         this.frequency = frequency;
     }
 
-    public String getWord() {
-        return word;
+    public String getOriginalWord() {
+        return originalWord;
+    }
+
+    public String getStemmedWord() {
+        return stemmedWord;
     }
 
     public String getDocument() {
         return document;
     }
 
-    public float getRank() {
+    public double getRank() {
         return rank;
     }
 
-    public void setRank(float rank) {
+    public void setRank(double rank) {
         this.rank = 0.5f*(rank * frequency);
     }
 }
