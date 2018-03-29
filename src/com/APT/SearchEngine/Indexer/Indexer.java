@@ -1,5 +1,5 @@
 package com.APT.SearchEngine.Indexer;
-
+//Shaalan
 import com.APT.SearchEngine.Data.Data;
 import com.APT.SearchEngine.Database.Database;
 import com.APT.SearchEngine.Models.WordModel;
@@ -11,7 +11,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,7 +22,7 @@ import java.util.regex.Pattern;
 public class Indexer {
     private static ArrayList<ArrayList<String>> listOfDocuments;
     private static Indexer indexer=null;
-    private static PrintWriter  writer;
+    private static PrintWriter writer;
     private ArrayList<Thread> threads = new ArrayList<>();
     private String[] documents={"https://en.wikipedia.org/wiki/Kinetics_(physics)" ,
             "https://en.wikipedia.org/wiki/Kinematics" ,
@@ -609,3 +612,5 @@ public class Indexer {
         return word;
     }
 }
+
+
