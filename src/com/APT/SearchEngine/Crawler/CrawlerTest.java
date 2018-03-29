@@ -11,7 +11,7 @@ public class CrawlerTest {
     {
 
         try {
-            Spider spider = new Spider(10);
+            Spider spider = new Spider(4);
 
         }
         catch (IOException ex)

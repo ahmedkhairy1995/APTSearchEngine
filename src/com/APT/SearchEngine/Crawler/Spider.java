@@ -3,7 +3,9 @@ package com.APT.SearchEngine.Crawler;
 import com.APT.SearchEngine.Data.Data;
 import com.APT.SearchEngine.Ranker.DetailedUrl;
 import com.APT.SearchEngine.Ranker.Ranker;
+import com.APT.SearchEngine.Robot.RobotParser;
 import javafx.util.Pair;
+import org.jruby.RubyProcess;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,7 +22,7 @@ import static java.lang.Thread.sleep;
 
 class Spider {
 
-    private int maxPages = 5000;
+    private int maxPages = 20;
     private Set<String> pagesVisited = Data.getDocuments();
     private Set<String> currentPages = new HashSet<>();
     private List<String> pagesToVisit = new LinkedList<>();
@@ -115,7 +117,7 @@ class Spider {
             threads.add(new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Search(true);
+                    Search(true,new RobotParser());
                 }
             }));
         }
@@ -137,7 +139,7 @@ class Spider {
         {
             insertRankIntoDB((DetailedUrl) map.getValue());
         }
-        databaseConnection.Close();
+
     }
 
 
@@ -163,8 +165,8 @@ class Spider {
                 synchronized (pagesToVisit) {
                     do {
                         next = this.pagesToVisit.remove(0);
-                    } while (currentPages.contains(next) && pagesVisited.contains(next) && pagesToVisit.size()!=0);
-
+                    } while ((currentPages.contains(next) || pagesVisited.contains(next)) && pagesToVisit.size()!=0);
+                   // pagesVisited.add(next);
                 }
 
 
@@ -182,18 +184,27 @@ class Spider {
 
     //Given a URL, this function will return all the links inside this webpage
     //Recheck for adding urls to files while working
-    private void crawl(String URL,int NumberOfTrials)
+    private void crawl(String URL,int NumberOfTrials,RobotParser Robot)
     {
         try{
             String temp;
-           Connection.Response response = Jsoup
+          Connection.Response response = Jsoup
                     .connect(URL)
                     .method(Connection.Method.POST)
                     .followRedirects(false)
                     .execute();
-            URL = response.header("Location");
-            if(pagesVisited.contains(URL))
+          if(response.header("Location")!= null)
+          {
+              URL = response.header("Location");
+              if(pagesVisited.contains(URL)) {
+                  return;
+              }
+          }
+
+            System.out.println(URL);
+            if (!Robot.checAllowedAndkDisallowed(URL)) {
                 return;
+            }
             Connection connection = Jsoup.connect(URL);
             Document htmlDocument = connection.get();
             Elements linksFound = htmlDocument.select("a[href]");
@@ -249,7 +260,7 @@ class Spider {
             try {
                 sleep(5000);
                 if(NumberOfTrials != 3)
-                    crawl(URL,NumberOfTrials + 1);
+                    crawl(URL,NumberOfTrials + 1,Robot);
             }
             catch (InterruptedException ex1)
             {
@@ -260,34 +271,39 @@ class Spider {
         catch(IOException ex){
             System.out.println("Error in the http request" + ex);
         }
+        catch (IllegalArgumentException ex)
+        {
+            System.out.println("Continue, just a wrong file");
+        }
 
     }
 
     private void insertIntoDB(String URL,String Doc)
    {
-        //call timons function twice
-        try{
-            databaseConnection.InsertAndUpdateRow("Crawler",URL,"Document","text",Doc);
-          databaseConnection.InsertAndUpdateRow("Crawler",URL,"Document","Indexed","false");
-        int x=0;
-        }
-        catch(Exception ex)
-        {
-            ex.printStackTrace();
-        }
+       synchronized(databaseConnection) {
+           //call timons function twice
+           try {
+
+               databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "text", Doc);
+               databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "Indexed", "false");
+               int x = 0;
+           } catch (Exception ex) {
+               ex.printStackTrace();
+           }
+       }
 
     }
 
     private void insertRankIntoDB(DetailedUrl target)
     {
-        //call timons function twice
-        try{
-            databaseConnection.InsertAndUpdateRow("Crawler",target.getName(),"Document","Popularity",Double.toString(target.getRank()));
+        synchronized(databaseConnection) {
+            //call timons function twice
+            try {
+                databaseConnection.InsertAndUpdateRow("Crawler", target.getName(), "Document", "Popularity", Double.toString(target.getRank()));
 
-        }
-        catch(Exception ex)
-        {
-            ex.printStackTrace();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
 
 
@@ -323,13 +339,14 @@ class Spider {
     }
 
 
-    private void Search(boolean firstTime) {
+    private void Search(boolean firstTime,RobotParser robotParser) {
         while(pagesVisited.size() < maxPages  )
         {
+            System.out.println(pagesVisited.size());
             String currentURL = nextUrl(firstTime);
             System.out.println(currentURL);
             if(!currentURL.equals("") && !currentURL.startsWith("mailto")) {
-                crawl(currentURL,0);
+                crawl(currentURL,0,robotParser);
             }
             if(!ArraysAreNotEmpty())
             {
@@ -431,7 +448,9 @@ class Spider {
                 ObjectOutputStream oos = new ObjectOutputStream(fout);
         ){
             oos.writeObject(ranker);
+            oos.close();
         } catch (Exception ex) {
+
             ex.printStackTrace();
         }
     }
@@ -441,15 +460,23 @@ class Spider {
         ObjectInputStream objectinputstream = null;
         try {
             FileInputStream streamIn = new FileInputStream("ranker.ser");
-            objectinputstream = new ObjectInputStream(streamIn);
+             objectinputstream = new ObjectInputStream(streamIn);
             ranker = (Ranker) objectinputstream.readObject();
                 if(ranker != null){
+                    objectinputstream.close();
                     return true;
                 }
                 return false;
             }
             catch (Exception e) {
             e.printStackTrace();
+        }
+        try {
+            objectinputstream.close();
+        }
+        catch(IOException ex)
+        {
+            ex.printStackTrace();
         }
      return false;
     }

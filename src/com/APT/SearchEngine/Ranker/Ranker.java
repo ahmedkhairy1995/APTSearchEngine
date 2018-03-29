@@ -48,10 +48,11 @@ public class Ranker implements Serializable {
                 temp = 1;
                 tempUrlObject = (DetailedUrl)item.getValue();
                 for (DetailedUrl inGoingLink : tempUrlObject.getInGoing()) {
-                    temp += inGoingLink.getRank()/(inGoingLink.getRankOverOutGoing());
+                    temp += (inGoingLink.getRankOverOutGoing());
                 }
                 temp *= dampingFactor;
                 tempUrlObject.setRank(temp);
+                System.out.println(temp);
             }
         }
     }

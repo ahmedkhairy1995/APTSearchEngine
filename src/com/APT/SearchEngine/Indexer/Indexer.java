@@ -206,7 +206,7 @@ public class Indexer {
                         wordCount.put(stemmedWord,1);
                         wordRank.put(stemmedWord,type);
 
-                        WordModel processedWord = new WordModel(word,stemmedWord,documents.get(index).get(2));
+                        WordModel processedWord = new WordModel(word,stemmedWord,documents.get(index).get(0));
 
                         //Adding the original word to a hash set
                         originalWords.add(word);
@@ -230,7 +230,7 @@ public class Indexer {
 
                         if(!originalWords.contains(word)){
                             //Adding original words to the list
-                            WordModel processedWord = new WordModel(word,stemmedWord,documents.get(index).get(2));
+                            WordModel processedWord = new WordModel(word,stemmedWord,documents.get(index).get(0));
                             processedWord.setPositions(positions.get(stemmedWord));
                             originalWords.add(word);
                             processedWords.add(processedWord);
@@ -253,7 +253,7 @@ public class Indexer {
                 processedWord.setRank((double)wordRank.get(processedWord.getStemmedWord())/(countOfWord*50));
 
                 synchronized (writer){
-                    writer.println(processedWord.getStemmedWord() + "  , Link: " + documents.get(index).get(2) +"  , at Index: "+index);
+                    writer.println(processedWord.getStemmedWord() + "  , Link: " + documents.get(index).get(0) +"  , at Index: "+index);
                 }
 
                 synchronized (databaseConnection) {
@@ -295,7 +295,7 @@ public class Indexer {
             occurrence = subList.indexOf(stemmedWord);
             if(occurrence!=-1){
                 positions.add(i+occurrence);
-                i+=(occurrence -1);
+                i+=(occurrence);
             }
             else break;
         }
