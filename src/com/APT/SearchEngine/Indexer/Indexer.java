@@ -4,26 +4,139 @@ import com.APT.SearchEngine.Data.Data;
 import com.APT.SearchEngine.Models.WordModel;
 import opennlp.tools.stemmer.PorterStemmer;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Indexer {
     private static Indexer indexer=null;
-    //    private String[] documents=(String[]) Data.getMyDocuments().keySet().toArray();
-    private String[] documents={""};
+    private static PrintWriter  writer;
+    private ArrayList<Thread> threads = new ArrayList<>();
+    private String[] documents={"https://en.wikipedia.org/wiki/Kinetics_(physics)" ,
+            "https://en.wikipedia.org/wiki/Kinematics" ,
+            "https://en.wikipedia.org/wiki/Second_law_of_motion" ,
+            "https://en.wikipedia.org/wiki/Statistical_mechanics" ,
+            "https://en.wikipedia.org/wiki/Statics" ,
+            "https://en.wikipedia.org/wiki/Couple_(mechanics)" ,
+            "https://en.wikipedia.org/wiki/Angular_momentum" ,
+            "https://en.wikipedia.org/wiki/Acceleration" ,
+            "https://en.wikipedia.org/wiki/Potential_energy" ,
+            "https://en.wikipedia.org/wiki/Kinetic_energy" ,
+            "https://en.wikipedia.org/wiki/D%27Alembert%27s_principle" ,
+            "https://en.wikipedia.org/wiki/Frame_of_reference" ,
+            "https://en.wikipedia.org/wiki/Impulse_(physics)" ,
+            "https://en.wikipedia.org/wiki/Inertia" ,
+            "https://en.wikipedia.org/wiki/Mass" ,
+            "https://en.wikipedia.org/wiki/Inertial_frame_of_reference" ,
+            "https://en.wikipedia.org/wiki/Work_(physics)" ,
+            "https://en.wikipedia.org/wiki/Moment_of_inertia" ,
+            "https://en.wikipedia.org/wiki/Power_(physics)" ,
+            "https://en.wikipedia.org/wiki/Space" ,
+            "https://en.wikipedia.org/wiki/Momentum" ,
+            "https://en.wikipedia.org/wiki/Moment_(physics)" ,
+            "https://en.wikipedia.org/wiki/Torque" ,
+            "https://en.wikipedia.org/wiki/Time" ,
+            "https://en.wikipedia.org/wiki/Speed" ,
+            "https://en.wikipedia.org/wiki/Virtual_work" ,
+            "https://en.wikipedia.org/wiki/Velocity" ,
+            "https://en.wikipedia.org/wiki/Newton%27s_laws_of_motion" ,
+            "https://en.wikipedia.org/wiki/Analytical_mechanics" ,
+            "https://en.wikipedia.org/wiki/Lagrangian_mechanics" ,
+            "https://en.wikipedia.org/wiki/Routhian_mechanics" ,
+            "https://en.wikipedia.org/wiki/Hamilton%E2%80%93Jacobi_equation" ,
+            "https://en.wikipedia.org/wiki/Udwadia%E2%80%93Kalaba_equation" ,
+            "https://en.wikipedia.org/wiki/Koopman%E2%80%93von_Neumann_classical_mechanics" ,
+            "https://en.wikipedia.org/wiki/Hamiltonian_mechanics" ,
+            "https://en.wikipedia.org/wiki/Appell%27s_equation_of_motion" ,
+            "https://en.wikipedia.org/wiki/Equations_of_motion" ,
+            "https://en.wikipedia.org/wiki/Damping_ratio" ,
+            "https://en.wikipedia.org/wiki/Damping" ,
+            "https://en.wikipedia.org/wiki/Friction" ,
+            "https://en.wikipedia.org/wiki/Euler%27s_laws_of_motion" ,
+            "https://en.wikipedia.org/wiki/Harmonic_oscillator" ,
+            "https://en.wikipedia.org/wiki/Non-inertial_reference_frame" ,
+            "https://en.wikipedia.org/wiki/Fictitious_force" ,
+            "https://en.wikipedia.org/wiki/Linear_motion" ,
+            "https://en.wikipedia.org/wiki/Relative_velocity" ,
+            "https://en.wikipedia.org/wiki/Newton%27s_law_of_universal_gravitation" ,
+            "https://en.wikipedia.org/wiki/Mechanics_of_planar_particle_motion" ,
+            "https://en.wikipedia.org/wiki/Euler%27s_equations_(rigid_body_dynamics)" ,
+            "https://en.wikipedia.org/wiki/Rigid_body_dynamics" ,
+            "https://en.wikipedia.org/wiki/Rigid_body" ,
+            "https://en.wikipedia.org/wiki/Rotation_around_a_fixed_axis" ,
+            "https://en.wikipedia.org/wiki/Vibration" ,
+            "https://en.wikipedia.org/wiki/Simple_harmonic_motion" ,
+            "https://en.wikipedia.org/wiki/Centripetal_force" ,
+            "https://en.wikipedia.org/wiki/Rotating_reference_frame" ,
+            "https://en.wikipedia.org/wiki/Circular_motion" ,
+            "https://en.wikipedia.org/wiki/Coriolis_force" ,
+            "https://en.wikipedia.org/wiki/Reactive_centrifugal_force" ,
+            "https://en.wikipedia.org/wiki/Centrifugal_force" ,
+            "https://en.wikipedia.org/wiki/Angular_acceleration" ,
+            "https://en.wikipedia.org/wiki/Rotational_speed" ,
+            "https://en.wikipedia.org/wiki/Pendulum_(mathematics)" ,
+            "https://en.wikipedia.org/wiki/Angular_velocity" ,
+            "https://en.wikipedia.org/wiki/Angular_frequency" ,
+            "https://en.wikipedia.org/wiki/Angular_displacement" ,
+            "https://en.wikipedia.org/wiki/Jeremiah_Horrocks" ,
+            "https://en.wikipedia.org/wiki/Christiaan_Huygens" ,
+            "https://en.wikipedia.org/wiki/Galileo_Galilei" ,
+            "https://en.wikipedia.org/wiki/Jean_le_Rond_d%27Alembert" ,
+            "https://en.wikipedia.org/wiki/Leonhard_Euler" ,
+            "https://en.wikipedia.org/wiki/Edmond_Halley" ,
+            "https://en.wikipedia.org/wiki/Pierre-Simon_Laplace" ,
+            "https://en.wikipedia.org/wiki/Joseph-Louis_Lagrange" ,
+            "https://en.wikipedia.org/wiki/Alexis_Clairaut" ,
+            "https://en.wikipedia.org/wiki/Daniel_Bernoulli" ,
+            "https://en.wikipedia.org/wiki/Sim%C3%A9on_Denis_Poisson" ,
+            "https://en.wikipedia.org/wiki/William_Rowan_Hamilton" ,
+            "https://en.wikipedia.org/wiki/Template:Classical_mechanics" ,
+            "https://en.wikipedia.org/wiki/Augustin-Louis_Cauchy" ,
+            "https://en.wikipedia.org/wiki/Johann_Bernoulli" ,
+            "https://en.wikipedia.org/wiki/Quantum_mechanics" ,
+            "https://en.wikipedia.org/w/index.php?title=Template:Classical_mechanics&action=edit" ,
+            "https://en.wikipedia.org/wiki/Template_talk:Classical_mechanics" ,
+            "https://en.wikipedia.org/wiki/Glossary_of_elementary_quantum_mechanics" ,
+            "https://en.wikipedia.org/wiki/Introduction_to_quantum_mechanics" ,
+            "https://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation" ,
+            "https://en.wikipedia.org/wiki/Bra%E2%80%93ket_notation" ,
+            "https://en.wikipedia.org/wiki/Old_quantum_theory" ,
+            "https://en.wikipedia.org/wiki/History_of_quantum_mechanics" ,
+            "https://en.wikipedia.org/wiki/Complementarity_(physics)" ,
+            "https://en.wikipedia.org/wiki/Interference_(wave_propagation)" ,
+            "https://en.wikipedia.org/wiki/Hamiltonian_(quantum_mechanics)" ,
+            "https://en.wikipedia.org/wiki/Energy_level" ,
+            "https://en.wikipedia.org/wiki/Quantum_entanglement" ,
+            "https://en.wikipedia.org/wiki/Quantum_decoherence" ,
+            "https://en.wikipedia.org/wiki/Quantum_number" ,
+            "https://en.wikipedia.org/wiki/Quantum_nonlocality" ,
+            "https://en.wikipedia.org/wiki/Measurement_in_quantum_mechanics" ,
+            "https://en.wikipedia.org/wiki/Symmetry_in_quantum_mechanics" ,
+            "https://en.wikipedia.org/wiki/Quantum_superposition"};
     private int numThreads;
 
     private Indexer(){
     }
 
     public static Indexer getInstance(){
-        if(indexer==null)
+        if(indexer==null){
+            try {
+                writer = new PrintWriter("MyConsole.txt", "UTF-8");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             indexer=new Indexer();
+        }
         return indexer;
     }
 
@@ -34,34 +147,64 @@ public class Indexer {
     public void beginIndexing(){
         for(int i=0;i<numThreads;i++){
             final int offset=i;
-            new Thread(new Runnable() {
+            threads.add(new Thread(new Runnable() {
                 PorterStemmer porterStemmer;
                 ArrayList<WordModel> processedWords;
                 HashMap<String,Integer> wordCount;
                 HashMap<String,Integer> wordRank;
+                int indexCounter=offset;
                 @Override
                 public void run() {
                     porterStemmer=new PorterStemmer();
                     processedWords = new ArrayList<>();
                     wordCount = new HashMap<>();
                     wordRank = new HashMap<>();
-                    index(offset,porterStemmer,processedWords,wordCount,wordRank);
+                    index(indexCounter,porterStemmer,processedWords,wordCount,wordRank);
                 }
-            }).start();
+            }));
         }
+
+        for (Thread thread : threads)
+            thread.start();
+
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        writer.println("Closing!!!");
+        writer.close();
     }
 
     private void index(int index,PorterStemmer porterStemmer,ArrayList<WordModel> processedWords,HashMap<String,Integer> wordCount,HashMap<String,Integer> wordRank){
         if(index>=documents.length)
             return;
+
+        Document document = null;
         try{
             //Get the whole document in HTML Format
-            Document document = Jsoup.connect(documents[index]).get();
+            try {
+                document = Jsoup.connect(documents[index]).get();
+
+                if(document==null)
+                    //Recursive call
+                    index(index+numThreads,porterStemmer,processedWords,wordCount,wordRank);
+            }
+            catch (UnsupportedMimeTypeException e){
+                e.printStackTrace();
+                //Recursive call
+                index(index+numThreads,porterStemmer,processedWords,wordCount,wordRank);
+            }
+
 
             //Delete all previous entries for that specific link
 
+
             //Get all elements as a hierarchy in HTML Format
-            Elements allElements=document.getAllElements();
+            Elements allElements = document.getAllElements();
 
             //Get total number of words in document
             int totalNumWords=getTotalNumWords(allElements);
@@ -69,17 +212,17 @@ public class Indexer {
             //Traversing from inner to outer
             for(int i=allElements.size()-1;i>0;i--){
 
+                //Get the tag of this element
+                Tag tag = allElements.get(i).tag();
+
+                //Skip some tags
+                if(isUnneccessaryTag(tag)) continue;
+
                 //Get inner HTML content
                 String innerHTML=allElements.get(i).text();
 
                 //HTMLTag has content to insert into DB
                 if (innerHTML.length()!=0){
-
-                    //Get the tag of this element
-                    Tag tag=allElements.get(i).tag();
-
-                    //Skip some tags
-                    if(isUnneccessaryTag(tag)) continue;
 
                     //Get tag ranking
                     int type=getTagRank(tag);
@@ -113,6 +256,7 @@ public class Indexer {
                         //if it's not a word or number
                         if(!(word.matches("[A-Za-z0-9ٍ][A-Za-z0-9.]*"))) continue;
 
+                        //Remove Non-Needed periods
                         word = removeNonNecessaryPeriods(word);
 
                         //convert word to lowercase
@@ -155,7 +299,9 @@ public class Indexer {
                     processedWord.setFrequency(wordFrequency);
                     processedWord.setRank(wordRank.get(processedWord.getWord())/(countOfWord*50));
 
-                    System.out.println(processedWord.getWord());
+                    synchronized (writer){
+                        writer.println(processedWord.getWord() + "  , Link: " + documents[index] +"  , at Index: "+index);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -184,7 +330,16 @@ public class Indexer {
 
         if (word.startsWith("<") && !word.endsWith(">")){
             //Get closing tag position for tags like <img> for example
-            occurrence=mySubList.indexOf(">") + startingPos;
+
+            int closingTagOccurrence = mySubList.indexOf("/>");
+            if(closingTagOccurrence!=-1)
+                occurrence = closingTagOccurrence + startingPos;
+
+            if(occurrence==-1){
+                closingTagOccurrence = mySubList.indexOf(">");
+                if(closingTagOccurrence!=-1)
+                    occurrence = closingTagOccurrence + startingPos;
+            }
 
             if (occurrence==-1){
                 for(int i=startingPos;i<items.size();i++){
@@ -288,7 +443,7 @@ public class Indexer {
     }
 
     private boolean isUnneccessaryTag(Tag tag){
-        return (tag.getName().equals("head") ||tag.getName().equals("require-auth")||tag.getName().equals("noscript")||tag.getName().equals("nav")|| tag.getName().equals("input")|| tag.getName().equals("footer")|| tag.getName().equals("form") || tag.getName().equals("html")|| tag.getName().equals("div")|| tag.getName().equals("body")|| tag.getName().equals("style")|| tag.getName().equals("script"));
+        return (tag.getName().equals("head") ||tag.getName().equals("require-auth")||tag.getName().equals("noscript")||tag.getName().equals("nav")|| tag.getName().equals("input")|| tag.getName().equals("footer")|| tag.getName().equals("form") || tag.getName().equals("html")|| tag.getName().equals("div")|| tag.getName().equals("body")|| tag.getName().equals("style")|| tag.getName().equals("mstyle")|| tag.getName().equals("script")|| tag.getName().contains("style")||tag.getName().contains("script"));
     }
 
     private int getTagRank(Tag tag){

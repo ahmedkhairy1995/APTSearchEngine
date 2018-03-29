@@ -114,13 +114,13 @@ class Spider {
         for (Thread thread : threads)
             thread.start();
 
-        try {
+       /* try {
             for (Thread thread : threads)
                 thread.join();
 
         } catch (InterruptedException ex) {
             ex.printStackTrace();
-        }
+        }*/
         databaseConnection.Close();
     }
 
@@ -130,41 +130,38 @@ class Spider {
     /*Function that handles many threads trying to get next URL to access*/
     private String nextUrl(boolean firstTime) {
         String next;
-        if(pagesToVisit.size()!=0) {
-            if(firstTime)
-            {
-                synchronized (currentPages)
-                {
-                    if(currentPages.size()!=0)
-                    {
 
-                        next = currentPages.iterator().next();
-                        currentPages.remove(next);
-                        pagesVisited.add(next);
-                        return next;
+            if (pagesToVisit.size() != 0) {
+                if (firstTime) {
+                    synchronized (currentPages) {
+                        if (currentPages.size() != 0) {
+
+                            next = currentPages.iterator().next();
+                            currentPages.remove(next);
+                            pagesVisited.add(next);
+                            return next;
+                        }
                     }
                 }
-            }
 
-                synchronized (pagesToVisit)
-                {
+                synchronized (pagesToVisit) {
                     do {
                         next = this.pagesToVisit.remove(0);
-                    } while (pagesVisited.contains(next));
-                    pagesVisited.add(next);
+                    } while (currentPages.contains(next) && pagesVisited.contains(next) && pagesToVisit.size()!=0);
+
                 }
 
 
+                synchronized (currentPages) {
+                    this.currentPages.add(next);
+                }
+                synchronized (currentPagesMemory) {
+                    writeURL(next, currentPagesMemory);
+                }
+                return next;
+            }
+            return "";
 
-            synchronized (currentPages) {
-                this.currentPages.add(next);
-            }
-            synchronized (currentPagesMemory) {
-                writeURL(next, currentPagesMemory);
-            }
-            return next;
-        }
-        return "";
     }
 
     //Given a URL, this function will return all the links inside this webpage
@@ -173,7 +170,7 @@ class Spider {
     {
         try{
             String temp;
-            Connection.Response response = Jsoup
+           Connection.Response response = Jsoup
                     .connect(URL)
                     .method(Connection.Method.POST)
                     .followRedirects(false)
@@ -221,7 +218,7 @@ class Spider {
             synchronized (pagesVisitedMemory)
             {
                 writeURL(URL,pagesVisitedMemory);
-
+                pagesVisited.add(URL);
                 //insert into db that is was visited
                 insertIntoDB(URL,htmlDocument.toString());
             }
