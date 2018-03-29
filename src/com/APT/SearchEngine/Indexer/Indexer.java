@@ -1,15 +1,17 @@
 package com.APT.SearchEngine.Indexer;
-
+//Shaalan
 import com.APT.SearchEngine.Data.Data;
 import com.APT.SearchEngine.Database.Database;
 import com.APT.SearchEngine.Models.WordModel;
 import opennlp.tools.stemmer.PorterStemmer;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -568,3 +570,5 @@ public class Indexer {
         return word;
     }
 }
+
+

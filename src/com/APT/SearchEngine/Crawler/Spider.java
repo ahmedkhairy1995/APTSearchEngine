@@ -1,6 +1,8 @@
 package com.APT.SearchEngine.Crawler;
 
 import com.APT.SearchEngine.Data.Data;
+import com.APT.SearchEngine.Ranker.DetailedUrl;
+import com.APT.SearchEngine.Ranker.Ranker;
 import javafx.util.Pair;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -31,12 +33,19 @@ class Spider {
     private ArrayList<Pair<String,Long>> DatabaseArray = new ArrayList<Pair<String,Long>>();
     private Set<String> newsPaperSites = Data.getNewsSite();
     private Database databaseConnection = Database.GetInstance() ;
-
-
+    private ArrayList<Thread> threads=new ArrayList<>();
+    private Ranker ranker;
 
     /*Constructor that takes # of threads and initializes all my variables */
     public Spider(int threadsNumber) throws IOException {
         numberOfThreads = threadsNumber;
+        //Reading Ranker
+
+
+        if(!readRanker())
+        {
+            ranker = new Ranker();
+        }
         //read from the files over here
 
         //Reading CurrentPages
@@ -44,21 +53,17 @@ class Spider {
         try {
             FileReader fileReader = new FileReader(currentPagesMemory);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while( (bufferLine = bufferedReader.readLine()) != null)
-            {
+            while ((bufferLine = bufferedReader.readLine()) != null) {
                 currentPages.add(bufferLine);
             }
             bufferedReader.close();
-        }
-        catch (FileNotFoundException ex){
+        } catch (FileNotFoundException ex) {
             System.out.println("Unable to open file '" + currentPagesMemory + "'");
 
             File f = new File(currentPagesMemory);
             f.createNewFile();
-        }
-        catch (IOException ex)
-        {
-            System.out.println("Unable to read from file '" + currentPagesMemory +"'");
+        } catch (IOException ex) {
+            System.out.println("Unable to read from file '" + currentPagesMemory + "'");
         }
 
 
@@ -66,103 +71,113 @@ class Spider {
         try {
             FileReader fileReader = new FileReader(pagesVisitedMemory);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while( (bufferLine = bufferedReader.readLine()) != null)
-            {
+            while ((bufferLine = bufferedReader.readLine()) != null) {
                 pagesVisited.add(bufferLine);
             }
             bufferedReader.close();
-        }
-        catch (FileNotFoundException ex){
+        } catch (FileNotFoundException ex) {
             System.out.println("Unable to open file '" + pagesVisitedMemory + "'");
 
             File f = new File(pagesVisitedMemory);
             f.createNewFile();
-        }
-        catch (IOException ex)
-        {
-            System.out.println("Unable to read from file '" + pagesVisitedMemory +"'");
+        } catch (IOException ex) {
+            System.out.println("Unable to read from file '" + pagesVisitedMemory + "'");
         }
 
         //Reading Pages that we need to visit
         try {
             FileReader fileReader = new FileReader(pagesToVisitMemory);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while( (bufferLine = bufferedReader.readLine()) != null)
-            {
+            while ((bufferLine = bufferedReader.readLine()) != null) {
                 System.out.println(bufferLine);
                 pagesToVisit.add(bufferLine);
             }
             bufferedReader.close();
-        }
-        catch (FileNotFoundException ex){
+        } catch (FileNotFoundException ex) {
             System.out.println("Unable to open file '" + pagesToVisitMemory + "'");
 
             File f = new File(pagesToVisitMemory);
             f.createNewFile();
-        }
-        catch (IOException ex)
-        {
-            System.out.println("Unable to read from file '" + pagesToVisitMemory +"'");
+        } catch (IOException ex) {
+            System.out.println("Unable to read from file '" + pagesToVisitMemory + "'");
         }
 
         currentPages.removeAll(pagesVisited);
 
 
-        if(currentPages.size()==0 && pagesVisited.size() ==0 && pagesToVisit.size()==0)
-        {
+        if (currentPages.size() == 0 && pagesVisited.size() == 0 && pagesToVisit.size() == 0) {
             //we are about to recrawl
             initializeFromDatabase();
-            maxPages = maxPages + 1000;
+            maxPages = DatabaseArray.size() + 1000;
         }
 
-        for(int i=0; i<numberOfThreads;i++) {
-            new Thread(new Runnable() {
+        for (int i = 0; i < numberOfThreads; i++) {
+            threads.add(new Thread(new Runnable() {
                 @Override
                 public void run() {
                     Search(true);
                 }
-            }).start();
+            }));
         }
+
+        for (Thread thread : threads)
+            thread.start();
+
+        try {
+            for (Thread thread : threads)
+                thread.join();
+
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+
+
+        ranker.computeRank();
+        for(Map.Entry map: ranker.getUrlMap().entrySet())
+        {
+            insertRankIntoDB((DetailedUrl) map.getValue());
+        }
+        databaseConnection.Close();
     }
+
+
+
 
     /*Function that handles many threads trying to get next URL to access*/
     private String nextUrl(boolean firstTime) {
         String next;
-        if(pagesToVisit.size()!=0) {
-            if(firstTime)
-            {
-                synchronized (currentPages)
-                {
-                    if(currentPages.size()!=0)
-                    {
 
-                        next = currentPages.iterator().next();
-                        currentPages.remove(next);
-                        pagesVisited.add(next);
-                        return next;
+            if (pagesToVisit.size() != 0) {
+                if (firstTime) {
+                    synchronized (currentPages) {
+                        if (currentPages.size() != 0) {
+
+                            next = currentPages.iterator().next();
+                            currentPages.remove(next);
+                            pagesVisited.add(next);
+                            return next;
+                        }
                     }
                 }
-            }
 
-                synchronized (pagesToVisit)
-                {
+                synchronized (pagesToVisit) {
                     do {
                         next = this.pagesToVisit.remove(0);
-                    } while (pagesVisited.contains(next));
-                    pagesVisited.add(next);
+                    } while (currentPages.contains(next) && pagesVisited.contains(next) && pagesToVisit.size()!=0);
+
                 }
 
 
+                synchronized (currentPages) {
+                    this.currentPages.add(next);
+                }
+                synchronized (currentPagesMemory) {
+                    writeURL(next, currentPagesMemory);
+                }
+                return next;
+            }
+            return "";
 
-            synchronized (currentPages) {
-                this.currentPages.add(next);
-            }
-            synchronized (currentPagesMemory) {
-                writeURL(next, currentPagesMemory);
-            }
-            return next;
-        }
-        return "";
     }
 
     //Given a URL, this function will return all the links inside this webpage
@@ -171,10 +186,19 @@ class Spider {
     {
         try{
             String temp;
+           Connection.Response response = Jsoup
+                    .connect(URL)
+                    .method(Connection.Method.POST)
+                    .followRedirects(false)
+                    .execute();
+            URL = response.header("Location");
+            if(pagesVisited.contains(URL))
+                return;
             Connection connection = Jsoup.connect(URL);
             Document htmlDocument = connection.get();
             Elements linksFound = htmlDocument.select("a[href]");
 
+            //Check for the robots.txt over here :)
             //Lock the next part to avoid racing conditions
             synchronized (pagesToVisit)
             {
@@ -188,7 +212,9 @@ class Spider {
                     else
                         temp = link.absUrl("href");
                     this.pagesToVisit.add(temp);
+                    ranker.insertURL(URL,temp);
                 }
+                updateRanker();
             }
 
             synchronized (pagesToVisitMemory)
@@ -210,7 +236,7 @@ class Spider {
             synchronized (pagesVisitedMemory)
             {
                 writeURL(URL,pagesVisitedMemory);
-
+                pagesVisited.add(URL);
                 //insert into db that is was visited
                 insertIntoDB(URL,htmlDocument.toString());
             }
@@ -251,6 +277,23 @@ class Spider {
         }
 
     }
+
+    private void insertRankIntoDB(DetailedUrl target)
+    {
+        //call timons function twice
+        try{
+            databaseConnection.InsertAndUpdateRow("Crawler",target.getName(),"Document","Popularity",Double.toString(target.getRank()));
+
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+
+    }
+
+
     private void writeURL(String URL,String file) {
         try {
             // Assume default encoding.
@@ -281,7 +324,7 @@ class Spider {
 
 
     private void Search(boolean firstTime) {
-        while(pagesVisited.size() < maxPages - 3000 )
+        while(pagesVisited.size() < maxPages  )
         {
             String currentURL = nextUrl(firstTime);
             System.out.println(currentURL);
@@ -379,5 +422,35 @@ class Spider {
             ex.printStackTrace();
         }
 
+    }
+
+    private void updateRanker()
+    {
+        try(
+                FileOutputStream fout = new FileOutputStream("ranker.ser", false);
+                ObjectOutputStream oos = new ObjectOutputStream(fout);
+        ){
+            oos.writeObject(ranker);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private boolean readRanker()
+    {
+        ObjectInputStream objectinputstream = null;
+        try {
+            FileInputStream streamIn = new FileInputStream("ranker.ser");
+            objectinputstream = new ObjectInputStream(streamIn);
+            ranker = (Ranker) objectinputstream.readObject();
+                if(ranker != null){
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e) {
+            e.printStackTrace();
+        }
+     return false;
     }
 }
