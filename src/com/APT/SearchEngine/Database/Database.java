@@ -5,8 +5,12 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.filter.*;
+import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 
+import javax.naming.Name;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Database {
@@ -133,11 +137,12 @@ public class Database {
         table.close();
     }
 
-    public ArrayList<Pair<String,Long>> getAllUrls(String tableName) throws IOException
+    public ArrayList<Pair<String,Long>> getAllUrls(String tableName,String columnFamily ,String columnName) throws IOException
     {
 
         Table table =connection.getTable(TableName.valueOf(tableName));
         Scan scan =new Scan ();
+        scan.addColumn(Bytes.toBytes(columnFamily),Bytes.toBytes(columnName));
         ResultScanner resultScanner = table.getScanner(scan);
         Cell[] cells;
         ArrayList<Pair<String,Long>> output = new ArrayList<>();
@@ -152,6 +157,35 @@ public class Database {
             }
         }
         return output;
+    }
+
+    public ArrayList<ArrayList<String>> getDocumentDetails (String tableName,String columnFamily, String columnName) throws IOException
+    {
+        Table table = connection.getTable(TableName.valueOf(tableName));
+        Scan scan = new Scan();
+        SingleColumnValueFilter filter = new SingleColumnValueFilter(
+                Bytes.toBytes(columnFamily),
+              Bytes.toBytes(columnName),
+             CompareFilter.CompareOp.EQUAL,
+            Bytes.toBytes("false")
+        );
+        scan.setFilter(filter);
+        ResultScanner resultScanner = table.getScanner(scan);
+        Cell[] cells;
+        ArrayList<String> row ;
+        ArrayList<ArrayList<String>> collectionOfRows= new ArrayList<ArrayList<String>>();
+        for (Result result : resultScanner)
+        {
+            cells = result.rawCells();
+            row = new ArrayList<>();
+            row.add(new String(CellUtil.cloneRow(cells[0])));
+            for (Cell cell:cells)
+            {
+                row.add(new String(CellUtil.cloneValue(cell)));
+            }
+            collectionOfRows.add(row);
+        }
+    return collectionOfRows;
     }
 
     public void ShowCell(Result result)

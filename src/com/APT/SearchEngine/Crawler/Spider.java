@@ -357,7 +357,7 @@ class Spider {
         //Fill the table of the database
         try
         {
-            DatabaseArray = databaseConnection.getAllUrls("Crawler");
+            DatabaseArray = databaseConnection.getAllUrls("Crawler","Document","text");
             long millis = System.currentTimeMillis() % 1000;
             long oneDay = TimeUnit.DAYS.toMillis(1);
             long fourDays = TimeUnit.DAYS.toMillis(4);
