@@ -22,7 +22,7 @@ import static java.lang.Thread.sleep;
 
 class Spider {
 
-    private int maxPages = 20;
+    private int maxPages = 5000;
     private Set<String> pagesVisited = Data.getDocuments();
     private Set<String> currentPages = new HashSet<>();
     private List<String> pagesToVisit = new LinkedList<>();
@@ -91,7 +91,6 @@ class Spider {
             FileReader fileReader = new FileReader(pagesToVisitMemory);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             while ((bufferLine = bufferedReader.readLine()) != null) {
-                System.out.println(bufferLine);
                 pagesToVisit.add(bufferLine);
             }
             bufferedReader.close();
@@ -201,7 +200,7 @@ class Spider {
               }
           }
 
-            System.out.println(URL);
+
             if (!Robot.checAllowedAndkDisallowed(URL)) {
                 return;
             }
@@ -344,7 +343,6 @@ class Spider {
         {
             System.out.println(pagesVisited.size());
             String currentURL = nextUrl(firstTime);
-            System.out.println(currentURL);
             if(!currentURL.equals("") && !currentURL.startsWith("mailto")) {
                 crawl(currentURL,0,robotParser);
             }
@@ -459,8 +457,13 @@ class Spider {
     {
         ObjectInputStream objectinputstream = null;
         try {
+            FileOutputStream fout = new FileOutputStream("ranker.ser", false);
+            ObjectOutputStream oos = new ObjectOutputStream(fout);
+            oos.close();
+
             FileInputStream streamIn = new FileInputStream("ranker.ser");
              objectinputstream = new ObjectInputStream(streamIn);
+
             ranker = (Ranker) objectinputstream.readObject();
                 if(ranker != null){
                     objectinputstream.close();
