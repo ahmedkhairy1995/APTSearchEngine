@@ -44,19 +44,41 @@ class Spider {
         //Reading Ranker
 
 
-        if(!readRanker())
-        {
-            ranker = new Ranker();
-        }
+
         //read from the files over here
 
+        //Reading Pages that we need to visit
+        try {
+            FileReader fileReader = new FileReader(pagesToVisitMemory);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            while ((bufferLine = bufferedReader.readLine()) != null) {
+               if (bufferLine.startsWith("http"))
+               {
+                   pagesToVisit.add(bufferLine);
+               }
+
+            }
+            bufferedReader.close();
+        } catch (FileNotFoundException ex) {
+            System.out.println("Unable to open file '" + pagesToVisitMemory + "'");
+
+            File f = new File(pagesToVisitMemory);
+            f.createNewFile();
+        } catch (IOException ex) {
+            System.out.println("Unable to read from file '" + pagesToVisitMemory + "'");
+        }
+
         //Reading CurrentPages
+
 
         try {
             FileReader fileReader = new FileReader(currentPagesMemory);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             while ((bufferLine = bufferedReader.readLine()) != null) {
-                currentPages.add(bufferLine);
+                if (bufferLine.startsWith("http"))
+                {
+                    currentPages.add(bufferLine);
+                }
             }
             bufferedReader.close();
         } catch (FileNotFoundException ex) {
@@ -74,7 +96,11 @@ class Spider {
             FileReader fileReader = new FileReader(pagesVisitedMemory);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             while ((bufferLine = bufferedReader.readLine()) != null) {
-                pagesVisited.add(bufferLine);
+                if (bufferLine.startsWith("http"))
+                {
+                    pagesVisited.add(bufferLine);
+                }
+
             }
             bufferedReader.close();
         } catch (FileNotFoundException ex) {
@@ -86,26 +112,14 @@ class Spider {
             System.out.println("Unable to read from file '" + pagesVisitedMemory + "'");
         }
 
-        //Reading Pages that we need to visit
-        try {
-            FileReader fileReader = new FileReader(pagesToVisitMemory);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            while ((bufferLine = bufferedReader.readLine()) != null) {
-                pagesToVisit.add(bufferLine);
-            }
-            bufferedReader.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("Unable to open file '" + pagesToVisitMemory + "'");
 
-            File f = new File(pagesToVisitMemory);
-            f.createNewFile();
-        } catch (IOException ex) {
-            System.out.println("Unable to read from file '" + pagesToVisitMemory + "'");
-        }
 
         currentPages.removeAll(pagesVisited);
 
-
+        if(true || !readRanker())
+        {
+            ranker = new Ranker();
+        }
         if (currentPages.size() == 0 && pagesVisited.size() == 0 && pagesToVisit.size() == 0) {
             //we are about to recrawl
             initializeFromDatabase();
@@ -189,7 +203,7 @@ class Spider {
             String temp;
           Connection.Response response = Jsoup
                     .connect(URL)
-                    .method(Connection.Method.POST)
+                    .method(Connection.Method.GET)
                     .followRedirects(false)
                     .execute();
           if(response.header("Location")!= null)
@@ -199,7 +213,12 @@ class Spider {
                   return;
               }
           }
-
+          //Test this
+          //This webpage is not html so we will neglect
+          if(!response.header("content-type").contains("html"))
+          {
+              return;
+          }
 
             if (!Robot.checAllowedAndkDisallowed(URL)) {
                 return;
@@ -283,7 +302,7 @@ class Spider {
            //call timons function twice
            try {
 
-               databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "text", Doc);
+               databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "Text", Doc);
                databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "Indexed", "false");
                int x = 0;
            } catch (Exception ex) {
@@ -298,14 +317,14 @@ class Spider {
         synchronized(databaseConnection) {
             //call timons function twice
             try {
-                databaseConnection.InsertAndUpdateRow("Crawler", target.getName(), "Document", "Popularity", Double.toString(target.getRank()));
-
+                if (target.getName().length()!=0 && pagesVisited.contains(target.getName()))
+                {
+                    databaseConnection.InsertAndUpdateRow("Crawler", target.getName(), "Document", "Popularity", Double.toString(target.getRank()));
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
-
-
     }
 
 
@@ -441,30 +460,43 @@ class Spider {
 
     private void updateRanker()
     {
-        try(
-                FileOutputStream fout = new FileOutputStream("ranker.ser", false);
-                ObjectOutputStream oos = new ObjectOutputStream(fout);
-        ){
+        ObjectOutputStream oos = null;
+        try {
+            FileOutputStream fout = new FileOutputStream("ranker.ser", false);
+            oos = new ObjectOutputStream(fout);
+
             oos.writeObject(ranker);
-            oos.close();
+
         } catch (Exception ex) {
 
             ex.printStackTrace();
         }
+        finally {
+            try{
+                oos.close();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private boolean readRanker()
     {
-        ObjectInputStream objectinputstream = null;
-        try {
-            FileOutputStream fout = new FileOutputStream("ranker.ser", false);
-            ObjectOutputStream oos = new ObjectOutputStream(fout);
-            oos.close();
+        if (pagesVisited.size()!=0)
+        {
+            ObjectInputStream objectinputstream = null;
+            try {
+            //    FileOutputStream fout = new FileOutputStream("ranker.ser", true);
+             //   ObjectOutputStream oos = new ObjectOutputStream(fout);
+             //   oos.close();
 
-            FileInputStream streamIn = new FileInputStream("ranker.ser");
-             objectinputstream = new ObjectInputStream(streamIn);
+                FileInputStream streamIn = new FileInputStream("ranker.ser");
+                objectinputstream = new ObjectInputStream(streamIn);
 
-            ranker = (Ranker) objectinputstream.readObject();
+                ranker = (Ranker) objectinputstream.readObject();
                 if(ranker != null){
                     objectinputstream.close();
                     return true;
@@ -472,15 +504,16 @@ class Spider {
                 return false;
             }
             catch (Exception e) {
-            e.printStackTrace();
+                e.printStackTrace();
+            }
+            try {
+                objectinputstream.close();
+            }
+            catch(IOException ex)
+            {
+                ex.printStackTrace();
+            }
         }
-        try {
-            objectinputstream.close();
-        }
-        catch(IOException ex)
-        {
-            ex.printStackTrace();
-        }
-     return false;
+      return false;
     }
 }
