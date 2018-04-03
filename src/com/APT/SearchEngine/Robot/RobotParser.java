@@ -19,6 +19,10 @@ public class RobotParser
         public  boolean checAllowedAndkDisallowed (String urlLink ) throws IOException {
             URL url = new URL(urlLink);                                  // make url object
             String host = url.getHost();                                 // get host
+            if (host == null)
+            {
+                return false;
+            }
             String path = "/"+url.getPath();
             boolean reparse = false;
             if (!AllowedURLList.containsKey(host)&& !DisallowedURLList.containsKey(host))

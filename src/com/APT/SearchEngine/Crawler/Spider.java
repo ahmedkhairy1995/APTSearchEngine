@@ -116,10 +116,10 @@ class Spider {
 
         currentPages.removeAll(pagesVisited);
 
-        if(true || !readRanker())
-        {
-            ranker = new Ranker();
-        }
+     //   if(true || !readRanker())
+       // {
+       //     ranker = new Ranker();
+       // }
         if (currentPages.size() == 0 && pagesVisited.size() == 0 && pagesToVisit.size() == 0) {
             //we are about to recrawl
             initializeFromDatabase();
@@ -147,19 +147,19 @@ class Spider {
         }
 
 
-        ranker.computeRank();
-        for(Map.Entry map: ranker.getUrlMap().entrySet())
-        {
-            insertRankIntoDB((DetailedUrl) map.getValue());
-        }
-
+       // ranker.computeRank();
+//        for(Map.Entry map: ranker.getUrlMap().entrySet())
+ //       {
+  //          insertRankIntoDB((DetailedUrl) map.getValue());
+ //       }
+        databaseConnection.Close();
     }
 
 
 
 
     /*Function that handles many threads trying to get next URL to access*/
-    private String nextUrl(boolean firstTime) {
+    private String nextUrl(boolean firstTime,RobotParser Robot) {
         String next;
 
             if (pagesToVisit.size() != 0) {
@@ -169,7 +169,15 @@ class Spider {
 
                             next = currentPages.iterator().next();
                             currentPages.remove(next);
-                            pagesVisited.add(next);
+                            //pagesVisited.add(next);
+
+                            try {
+                                if (!Robot.checAllowedAndkDisallowed(next)) {
+                                    return "";
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             return next;
                         }
                     }
@@ -181,7 +189,13 @@ class Spider {
                     } while ((currentPages.contains(next) || pagesVisited.contains(next)) && pagesToVisit.size()!=0);
                    // pagesVisited.add(next);
                 }
-
+                try {
+                    if (!Robot.checAllowedAndkDisallowed(next)) {
+                        return "";
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 synchronized (currentPages) {
                     this.currentPages.add(next);
@@ -197,7 +211,7 @@ class Spider {
 
     //Given a URL, this function will return all the links inside this webpage
     //Recheck for adding urls to files while working
-    private void crawl(String URL,int NumberOfTrials,RobotParser Robot)
+    private void crawl(String URL,int NumberOfTrials)
     {
         try{
             String temp;
@@ -215,14 +229,16 @@ class Spider {
           }
           //Test this
           //This webpage is not html so we will neglect
-          if(!response.header("content-type").contains("html"))
-          {
-              return;
-          }
+            if (response.header("content-type")!=null)
+            {
+                if(!response.header("content-type").contains("html"))
+                {
+                    return;
+                }
 
-            if (!Robot.checAllowedAndkDisallowed(URL)) {
-                return;
             }
+
+
             Connection connection = Jsoup.connect(URL);
             Document htmlDocument = connection.get();
             Elements linksFound = htmlDocument.select("a[href]");
@@ -241,9 +257,9 @@ class Spider {
                     else
                         temp = link.absUrl("href");
                     this.pagesToVisit.add(temp);
-                    ranker.insertURL(URL,temp);
+              //      ranker.insertURL(URL,temp);
                 }
-                updateRanker();
+             //   updateRanker();
             }
 
             synchronized (pagesToVisitMemory)
@@ -278,7 +294,7 @@ class Spider {
             try {
                 sleep(5000);
                 if(NumberOfTrials != 3)
-                    crawl(URL,NumberOfTrials + 1,Robot);
+                    crawl(URL,NumberOfTrials + 1);
             }
             catch (InterruptedException ex1)
             {
@@ -297,8 +313,8 @@ class Spider {
     }
 
     private void insertIntoDB(String URL,String Doc)
-   {
-       synchronized(databaseConnection) {
+    {
+
            //call timons function twice
            try {
 
@@ -308,13 +324,13 @@ class Spider {
            } catch (Exception ex) {
                ex.printStackTrace();
            }
-       }
+
 
     }
 
     private void insertRankIntoDB(DetailedUrl target)
     {
-        synchronized(databaseConnection) {
+
             //call timons function twice
             try {
                 if (target.getName().length()!=0 && pagesVisited.contains(target.getName()))
@@ -324,7 +340,7 @@ class Spider {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }
+
     }
 
 
@@ -345,7 +361,7 @@ class Spider {
             // Always close files.
             bufferedWriter.close();
         }
-        catch(IOException ex) {
+        catch(Exception ex) {
             System.out.println("Error writing to file '" + file + "'");
 
         }
@@ -361,9 +377,9 @@ class Spider {
         while(pagesVisited.size() < maxPages  )
         {
             System.out.println(pagesVisited.size());
-            String currentURL = nextUrl(firstTime);
+            String currentURL = nextUrl(firstTime,robotParser);
             if(!currentURL.equals("") && !currentURL.startsWith("mailto")) {
-                crawl(currentURL,0,robotParser);
+                crawl(currentURL,0);
             }
             if(!ArraysAreNotEmpty())
             {

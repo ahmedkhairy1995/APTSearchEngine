@@ -41,6 +41,7 @@ public class Ranker implements Serializable {
     {
         double temp=0;
         DetailedUrl tempUrlObject;
+        System.out.println("starting to compute popularity ");
         for(int i=0;i<20;i++)
         {
             for (Map.Entry item:urlMap.entrySet())
@@ -52,7 +53,8 @@ public class Ranker implements Serializable {
                 }
                 temp *= dampingFactor;
                 tempUrlObject.setRank(temp);
-                System.out.println(temp);
+
+                //System.out.println(temp);
             }
         }
     }
