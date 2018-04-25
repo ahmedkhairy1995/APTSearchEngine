@@ -359,7 +359,7 @@ public class Database {
                 String value2 = Bytes.toString(positionmap.get(key));
                 ArrayList<String> positions = new ArrayList<String>(Arrays.asList(value2.split(" ")));
                 RanksAndPositions=new Pair<Integer, ArrayList<String>>(value1,positions);
-                QuantifiersAndPositionsAndRanks.put(Bytes.toString(entry.getKey()),RanksAndPositions);
+                QuantifiersAndPositionsAndRanks.put(Bytes.toString(key),RanksAndPositions);
             }
             output.add(QuantifiersAndPositionsAndRanks);
 
