@@ -195,6 +195,7 @@ class Spider {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
+                    return "";
                 }
 
                 synchronized (currentPages) {
