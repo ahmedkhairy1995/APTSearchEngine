@@ -147,11 +147,11 @@ class Spider {
         }
 
 
-        ranker.computeRank();
-        for(Map.Entry map: ranker.getUrlMap().entrySet())
+        //ranker.computeRank();
+        /*for(Map.Entry map: ranker.getUrlMap().entrySet())
         {
             insertRankIntoDB((DetailedUrl) map.getValue());
-        }
+        }*/
 
     }
 
@@ -169,7 +169,7 @@ class Spider {
 
                             next = currentPages.iterator().next();
                             currentPages.remove(next);
-                            pagesVisited.add(next);
+                            //pagesVisited.add(next);
                             return next;
                         }
                     }
@@ -231,6 +231,7 @@ class Spider {
             //Lock the next part to avoid racing conditions
             synchronized (pagesToVisit)
             {
+                ranker.insertURLFrom(URL,linksFound.size());
                 for(Element link: linksFound)
                 {
                     //remove hash tags
@@ -241,7 +242,7 @@ class Spider {
                     else
                         temp = link.absUrl("href");
                     this.pagesToVisit.add(temp);
-                    ranker.insertURL(URL,temp);
+                    ranker.insertURLTo(temp);
                 }
                 updateRanker();
             }
@@ -267,7 +268,7 @@ class Spider {
                 writeURL(URL,pagesVisitedMemory);
                 pagesVisited.add(URL);
                 //insert into db that is was visited
-                insertIntoDB(URL,htmlDocument.toString());
+                insertIntoDB(URL,htmlDocument.toString(),linksFound.size());
             }
 
 
@@ -296,14 +297,15 @@ class Spider {
 
     }
 
-    private void insertIntoDB(String URL,String Doc)
-   {
+    private void insertIntoDB(String URL,String Doc,int Number)
+    {
        synchronized(databaseConnection) {
            //call timons function twice
            try {
 
                databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "Text", Doc);
                databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "Indexed", "false");
+               databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "OutGoing", Integer.toString(Number));
                int x = 0;
            } catch (Exception ex) {
                ex.printStackTrace();
@@ -312,17 +314,21 @@ class Spider {
 
     }
 
-    private void insertRankIntoDB(DetailedUrl target)
+    private void insertRankIntoDB(Ranker target)
     {
         synchronized(databaseConnection) {
             //call timons function twice
-            try {
-                if (target.getName().length()!=0 && pagesVisited.contains(target.getName()))
-                {
-                    databaseConnection.InsertAndUpdateRow("Crawler", target.getName(), "Document", "Popularity", Double.toString(target.getRank()));
+            for(Map.Entry map: ranker.getSimplifiedMapFrom().entrySet()) {
+
+
+                try {
+                    if (((String)map.getKey()).length() != 0 ) {
+                        databaseConnection.InsertAndUpdateRow("Crawler", (String)map.getKey(), "Document", "InGoing",Integer.toString(ranker.getSimplifiedMapTo().get((String) map.getKey())) );
+
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
             }
         }
     }
@@ -358,6 +364,7 @@ class Spider {
 
 
     private void Search(boolean firstTime,RobotParser robotParser) {
+
         while(pagesVisited.size() < maxPages  )
         {
             System.out.println(pagesVisited.size());
@@ -483,37 +490,32 @@ class Spider {
 
     }
 
-    private boolean readRanker()
-    {
-        if (pagesVisited.size()!=0)
-        {
+    private boolean readRanker() {
+        if (pagesVisited.size() != 0) {
             ObjectInputStream objectinputstream = null;
             try {
-            //    FileOutputStream fout = new FileOutputStream("ranker.ser", true);
-             //   ObjectOutputStream oos = new ObjectOutputStream(fout);
-             //   oos.close();
+                //    FileOutputStream fout = new FileOutputStream("ranker.ser", true);
+                //   ObjectOutputStream oos = new ObjectOutputStream(fout);
+                //   oos.close();
 
                 FileInputStream streamIn = new FileInputStream("ranker.ser");
                 objectinputstream = new ObjectInputStream(streamIn);
 
                 ranker = (Ranker) objectinputstream.readObject();
-                if(ranker != null){
+                if (ranker != null) {
                     objectinputstream.close();
                     return true;
                 }
                 return false;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             try {
                 objectinputstream.close();
-            }
-            catch(IOException ex)
-            {
+            } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
-      return false;
+        return false;
     }
 }
