@@ -90,6 +90,7 @@ public class Indexer {
 
         writer.println("Closing!!!");
         writer.close();
+        databaseConnection.Close();
     }
 
     private void index(int index,PorterStemmer porterStemmer,ArrayList<WordModel> processedWords,HashMap<String,Integer> wordCount,HashMap<String,Integer> wordRank, HashSet<String> originalWords, HashMap<String,String> positions){
@@ -115,14 +116,14 @@ public class Indexer {
 
         //Delete all previous entries for that specific link
         try {
-            synchronized (databaseConnection){
+
                 ArrayList<String>listOfWords= databaseConnection.getAllLinkWords("InvertedIndex","WordRank"
                         ,documents.get(index).get(0));
                 databaseConnection.BulkDelete("InvertedIndex",listOfWords, "WordRank"
                         ,documents.get(index).get(0));
                 databaseConnection.BulkDelete("InvertedIndex",listOfWords,"WordPosition"
                         ,documents.get(index).get(0));
-            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -163,7 +164,7 @@ public class Indexer {
                 List<String> items=purifyElements(allElements.get(i).toString());
 
                 for (int j=0;j<items.size();j++){
-                    //Get a word from my items
+                    //Get a word from  items
                     String word=items.get(j);
 
                     //This is needed to avoid inserting inner attributes as words
@@ -256,7 +257,7 @@ public class Indexer {
                     writer.println(processedWord.getStemmedWord() + "  , Link: " + documents.get(index).get(0) +"  , at Index: "+index);
                 }
 
-                synchronized (databaseConnection) {
+
                     databaseConnection.InsertAndUpdateRow("InvertedIndex",
                             processedWord.getOriginalWord(), "WordRank", processedWord.getDocument(), "" + processedWord.getRank());
                     databaseConnection.InsertAndUpdateRow("InvertedIndex",
@@ -267,7 +268,7 @@ public class Indexer {
                             processedWord.getOriginalWord(),"WordPosition","StemmedWord",processedWord.getStemmedWord());
                     databaseConnection.InsertAndUpdateRow("Crawler",
                             processedWord.getDocument(), "Document", "Indexed", "true");
-                }
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
