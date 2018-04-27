@@ -1,6 +1,7 @@
 package com.APT.SearchEngine.Retriever;
 
 import com.APT.SearchEngine.Database.Database;
+import com.APT.SearchEngine.PageRanking.PageRanking;
 import javafx.util.Pair;
 import org.jcodings.util.Hash;
 
@@ -12,15 +13,21 @@ import java.util.HashSet;
 public class Retriever {
 
     private Database databaseConnection = Database.GetInstance();
+    private PageRanking pageRanker  = new PageRanking();
     ///// call ranker functions inside this function
-    public ArrayList<ArrayList<String>> getResults (String tablename, ArrayList<String> rowkey, ArrayList<String>stemmed, String rankcolumnfamily, String positioncolumnfamily, boolean phrase)
+    public ArrayList<ArrayList<String>> getResults (ArrayList<String> rowkey, ArrayList<String>stemmed,ArrayList<Pair<String, Integer>> IndexOfPhrase, boolean phrase)
     {
         ArrayList<ArrayList<String>> output = new ArrayList<>();
+        ArrayList<ArrayList<String>> output2 = new ArrayList<>();
+        ArrayList<String> sortedlinks = new ArrayList<>();
         if (phrase)
         {
-            ArrayList<HashMap<String,Pair<Integer,ArrayList<String>>>> result = new ArrayList<>();
+            ArrayList<HashMap<String,Pair<Float,ArrayList<String>>>> result = new ArrayList<>();
+
             try {
-                result = databaseConnection.getPhraseLinks(tablename,rowkey,rankcolumnfamily,positioncolumnfamily);
+                result = databaseConnection.getPhraseLinks("InvertedIndex",rowkey,"WordRank","WordPosition");
+                sortedlinks=pageRanker.PhraseRanker(result,IndexOfPhrase);
+                output = databaseConnection.getSortedLinksDocuement("Crawler",sortedlinks,"Document","Text");
                 /// will call phrase ranker
             }
             catch (IOException e) {
@@ -29,17 +36,21 @@ public class Retriever {
         }
         else
         {
-            ArrayList<HashMap<String,Integer>> result = new ArrayList<>();
-            ArrayList<HashMap<String,Integer>> stemmedresult = new ArrayList<>();
+            ArrayList<HashMap<String,Float>> result = new ArrayList<>();
+            ArrayList<HashMap<String,Float>> stemmedresult = new ArrayList<>();
             if (rowkey.size() >1)
             {
                 try {
-                    result= databaseConnection.getOriginalMultipleWordsLinks(tablename,rowkey,rankcolumnfamily);
+                    result= databaseConnection.getOriginalMultipleWordsLinks("InvertedIndex",rowkey,"WordRank");
                     /// call normal ranker
+                    sortedlinks=pageRanker.RankerNormal(result);
                     /// call database function that gets documents
-                    stemmedresult = databaseConnection.getStemmedMultipleWordsLinks(tablename,stemmed,rankcolumnfamily);
+                    output=databaseConnection.getSortedLinksDocuement("Crawler",sortedlinks,"Document","Text");
+                    stemmedresult = databaseConnection.getStemmedMultipleWordsLinks("InvertedIndex",stemmed,rowkey,"WordRank");
                     //  call normal ranker
+                    sortedlinks=pageRanker.RankerNormal(stemmedresult);
                     // call database function that gets documents
+                    output2=databaseConnection.getSortedLinksDocuement("Crawler",sortedlinks,"Document","Text");
                 }
                 catch (IOException e) {
                     e.printStackTrace();
@@ -48,18 +59,23 @@ public class Retriever {
             else
             {
                 try {
-                    result= databaseConnection.getOriginalWordLinks(tablename,rowkey.get(0),rankcolumnfamily);
+                    result= databaseConnection.getOriginalWordLinks("InvertedIndex",rowkey.get(0),"WordRank");
                     //calll normal search
-                    // call database function that gets documents
-                    stemmedresult = databaseConnection.getStemmedWordsLinks(tablename,rankcolumnfamily,stemmed.get(0));
+                    sortedlinks=pageRanker.RankerNormal(result);
+                    /// call database function that gets documents
+                    output=databaseConnection.getSortedLinksDocuement("Crawler",sortedlinks,"Document","Text");
+                    stemmedresult = databaseConnection.getStemmedWordLinks("InvertedIndex","WordRank",stemmed.get(0),rowkey.get(0));
                     /// call normal ranker
-                    /// call database that gets documents
+                    sortedlinks=pageRanker.RankerNormal(stemmedresult);
+                    // call database function that gets documents
+                    output2=databaseConnection.getSortedLinksDocuement("Crawler",sortedlinks,"Document","Text");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
         /// concatenate and send
+        output.addAll(output2);
         return output;
     }
 }

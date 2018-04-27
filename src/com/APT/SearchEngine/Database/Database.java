@@ -167,7 +167,7 @@ public class Database {
         ShowCell(result);
         table.close();
     }
-    public ArrayList<HashMap<String,Integer>> getOriginalWordLinks (String tableName,String rowkey,String columnFamily) throws IOException
+    public ArrayList<HashMap<String,Float>> getOriginalWordLinks (String tableName,String rowkey,String columnFamily) throws IOException
     {
         Table table = connection.getTable(TableName.valueOf(tableName));
         Get get = new Get (Bytes.toBytes(rowkey));
@@ -181,18 +181,18 @@ public class Database {
         Result result = table.get(get);
 
         NavigableMap<byte[],byte[]> familymap = result.getFamilyMap(columnFamily.getBytes());
-        HashMap<String,Integer> QuantifersAndValues = new HashMap<>();
+        HashMap<String,Float> QuantifersAndValues = new HashMap<>();
 
         for(Map.Entry<byte[], byte[]> entry: familymap.entrySet())
         {
-            QuantifersAndValues.put(Bytes.toString(entry.getKey()),Bytes.toInt(entry.getValue()));
+            QuantifersAndValues.put(Bytes.toString(entry.getKey()),Float.parseFloat(Bytes.toString(entry.getValue())));
         }
         table.close();
-        ArrayList<HashMap<String,Integer>> output= new ArrayList<>();
+        ArrayList<HashMap<String,Float>> output= new ArrayList<>();
         output.add(QuantifersAndValues);
         return output;
      }
-     public ArrayList<HashMap<String,Integer>> getStemmedWordsLinks (String tableName,String columnFamily, String stemmedWord) throws IOException
+     public ArrayList<HashMap<String,Float>> getStemmedWordLinks (String tableName,String columnFamily, String stemmedWord,String originalword) throws IOException
      {
          Table table = connection.getTable(TableName.valueOf(tableName));
          Scan scan = new Scan();
@@ -211,11 +211,17 @@ public class Database {
                  new BinaryComparator(Bytes.toBytes("StemmedWord"))
                                     )
          );
+         filterlist.addFilter(
+                 new RowFilter(
+                 CompareFilter.CompareOp.NOT_EQUAL,
+                 new BinaryComparator(Bytes.toBytes(originalword))
+                 )
+         );
          scan.setFilter(filterlist);
          ResultScanner resultScanner = table.getScanner(scan);
          NavigableMap<byte[],byte[]> familymap;
-         HashMap<String,Integer> QuantifiersAndValues;
-         ArrayList<HashMap<String,Integer>> output = new ArrayList<>();
+         HashMap<String,Float> QuantifiersAndValues;
+         ArrayList<HashMap<String,Float>> output = new ArrayList<>();
          ArrayList<String> row ;
          Cell[] cells;
          for (Result result : resultScanner)
@@ -227,7 +233,7 @@ public class Database {
              row.add(new String(CellUtil.cloneRow(cells[0])));
              for(Map.Entry<byte[], byte[]> entry: familymap.entrySet())
              {
-                 QuantifiersAndValues.put(Bytes.toString(entry.getKey()),Bytes.toInt(entry.getValue()));
+                 QuantifiersAndValues.put(Bytes.toString(entry.getKey()),Float.parseFloat(Bytes.toString(entry.getValue())));
              }
              output.add(QuantifiersAndValues);
          }
@@ -235,7 +241,7 @@ public class Database {
          return output;
 
      }
-     public ArrayList<HashMap<String,Integer>> getOriginalMultipleWordsLinks(String tableName,ArrayList<String> rowkey, String columnFamily) throws IOException
+     public ArrayList<HashMap<String,Float>> getOriginalMultipleWordsLinks(String tableName,ArrayList<String> rowkey, String columnFamily) throws IOException
      {
          Table table = connection.getTable(TableName.valueOf(tableName));
          QualifierFilter filter = new QualifierFilter(
@@ -253,15 +259,15 @@ public class Database {
          }
          Result resultout[] = table.get(getsList);
          NavigableMap<byte[],byte[]> familymap;
-         HashMap<String,Integer>QuantifiersAndValues;
-         ArrayList<HashMap<String,Integer>> output = new ArrayList<>();
+         HashMap<String,Float>QuantifiersAndValues;
+         ArrayList<HashMap<String,Float>> output = new ArrayList<>();
          for (Result result: resultout)
          {
              familymap = result.getFamilyMap(columnFamily.getBytes());
              QuantifiersAndValues = new HashMap<>();
              for (Map.Entry<byte[],byte[]> entry : familymap.entrySet())
              {
-                 QuantifiersAndValues.put(Bytes.toString(entry.getKey()),Bytes.toInt((entry.getValue())));
+                 QuantifiersAndValues.put(Bytes.toString(entry.getKey()),Float.parseFloat(Bytes.toString(entry.getValue())));
              }
              output.add(QuantifiersAndValues);
          }
@@ -269,23 +275,23 @@ public class Database {
          return output;
      }
 
-     public ArrayList<HashMap<String,Integer>> getStemmedMultipleWordsLinks (String tableName,ArrayList<String>stemmedWord,String columnFamily) throws IOException
+     public ArrayList<HashMap<String,Float>> getStemmedMultipleWordsLinks (String tableName,ArrayList<String>stemmedWord,ArrayList<String>originalword,String columnFamily) throws IOException
      {
          Table table = connection.getTable(TableName.valueOf(tableName));
-         HashMap<String,Integer> QuantifiersAndValues;
-         ArrayList<HashMap<String,Integer>> output = new ArrayList<>();
+         HashMap<String,Float> QuantifiersAndValues;
+         ArrayList<HashMap<String,Float>> output = new ArrayList<>();
          ArrayList<String> row ;
          Cell[] cells;
          Scan scan;
          FilterList filterlist;
          ResultScanner resultScanner;
          NavigableMap<byte[],byte[]>familymap;
-         Filter filter = new QualifierFilter(CompareFilter.CompareOp.NOT_EQUAL,new BinaryComparator(Bytes.toBytes("StemmedWord")));
+         QualifierFilter filter = new QualifierFilter(CompareFilter.CompareOp.NOT_EQUAL,new BinaryComparator(Bytes.toBytes("StemmedWord")));
          for (int i=0; i<stemmedWord.size();i++)
          {
               scan = new Scan();
               filterlist = new FilterList();
-              filterlist.addFilter(filter);
+
               filterlist.addFilter(
                       new SingleColumnValueFilter(
                               Bytes.toBytes(columnFamily),
@@ -294,6 +300,16 @@ public class Database {
                               Bytes.toBytes(stemmedWord.get(i))
                                                 )
               );
+             filterlist.addFilter(filter);
+             for (int j=0;j<originalword.size();j++)
+             {
+                  filterlist.addFilter(
+                          new RowFilter(
+                                  CompareFilter.CompareOp.NOT_EQUAL,
+                                  new BinaryComparator(Bytes.toBytes(originalword.get(j)))
+                          )
+                 );
+              }
               scan.setFilter(filterlist);
               resultScanner = table.getScanner(scan);
              for (Result result : resultScanner)
@@ -305,7 +321,7 @@ public class Database {
                  row.add(new String(CellUtil.cloneRow(cells[0])));
                  for(Map.Entry<byte[], byte[]> entry: familymap.entrySet())
                  {
-                     QuantifiersAndValues.put(Bytes.toString(entry.getKey()),Bytes.toInt(entry.getValue()));
+                     QuantifiersAndValues.put(Bytes.toString(entry.getKey()),Float.parseFloat(Bytes.toString(entry.getValue())));
                  }
                  output.add(QuantifiersAndValues);
              }
@@ -314,7 +330,7 @@ public class Database {
          return output;
      }
 
-    public ArrayList<HashMap<String,Pair<Integer,ArrayList<String>>>> getPhraseLinks (String tableName,ArrayList<String>rowkey,String rankcolumnFamily,String postioncolumnFamily) throws IOException
+    public ArrayList<HashMap<String,Pair<Float,ArrayList<String>>>> getPhraseLinks (String tableName,ArrayList<String>rowkey,String rankcolumnFamily,String postioncolumnFamily) throws IOException
     {
         Table table = connection.getTable(TableName.valueOf(tableName));
         QualifierFilter filter = new QualifierFilter(
@@ -338,14 +354,14 @@ public class Database {
 
         }
         Result resultout1[] = table.get(getsList1);
-        Result resultout2[] = table.get(getsList1);
+        Result resultout2[] = table.get(getsList2 );
         NavigableMap<byte[],byte[]> rankmap;
         NavigableMap<byte[],byte[]> positionmap;
 
-        //Map<String,Integer>QuantifiersAndRanks;
-        HashMap<String,Pair<Integer,ArrayList<String>>> QuantifiersAndPositionsAndRanks ;
-        Pair<Integer,ArrayList<String>> RanksAndPositions;
-        ArrayList<HashMap<String,Pair<Integer,ArrayList<String>>>> output = new ArrayList<>();
+        //Map<String,Float>QuantifiersAndRanks;
+        HashMap<String,Pair<Float,ArrayList<String>>> QuantifiersAndPositionsAndRanks ;
+        Pair<Float,ArrayList<String>> RanksAndPositions;
+        ArrayList<HashMap<String,Pair<Float,ArrayList<String>>>> output = new ArrayList<>();
         int i,j;
         for (i=0,j=0;j<resultout2.length && i<resultout1.length;i++,j++)
         {
@@ -355,10 +371,11 @@ public class Database {
             for (Map.Entry<byte[],byte[]> entry : rankmap.entrySet())
             {
                 byte[] key = entry.getKey();
-                Integer value1 = Bytes.toInt(entry.getValue());
+                String Keyyy = Bytes.toString(key);
+                Float value1 = Float.parseFloat(Bytes.toString(entry.getValue()));
                 String value2 = Bytes.toString(positionmap.get(key));
                 ArrayList<String> positions = new ArrayList<String>(Arrays.asList(value2.split(" ")));
-                RanksAndPositions=new Pair<Integer, ArrayList<String>>(value1,positions);
+                RanksAndPositions=new Pair<Float, ArrayList<String>>(value1,positions);
                 QuantifiersAndPositionsAndRanks.put(Bytes.toString(key),RanksAndPositions);
             }
             output.add(QuantifiersAndPositionsAndRanks);
@@ -386,6 +403,7 @@ public class Database {
                 output.add(word);
             }
         }
+        table.close();
         return output;
     }
 
@@ -408,6 +426,7 @@ public class Database {
                 output.add(token);
             }
         }
+        table.close();
         return output;
     }
 
@@ -437,6 +456,7 @@ public class Database {
             }
             collectionOfRows.add(row);
         }
+        table.close();
         return collectionOfRows;
     }
 
@@ -454,15 +474,17 @@ public class Database {
 
         Result result[] = table.get(getsList);
         Cell[] cells;
-        ArrayList<String> row = new ArrayList<>(); ;
+        ArrayList<String> row;
         ArrayList<ArrayList<String>> collectionOfRows= new ArrayList<ArrayList<String>>();
         for (int i = 0;i<result.length;i++)
         {
+            row= new ArrayList<>(); ;
             cells = result[i].rawCells();
-            row.add(new String(CellUtil.cloneValue(cells[0])));
             row.add(new String(CellUtil.cloneRow(cells[0])));
+            row.add(new String(CellUtil.cloneValue(cells[0])));
             collectionOfRows.add(row);
         }
+        table.close();
         return collectionOfRows;
     }
 

@@ -314,21 +314,21 @@ class Spider {
 
     }
 
-    private void insertIntoDB(String URL,String Doc,int Number)
-    {
-       synchronized(databaseConnection) {
-           //call timons function twice
-           try {
+    private void insertIntoDB(String URL,String Doc,int Number) {
+        synchronized (databaseConnection) {
+            //call timons function twice
+            try {
 
-               databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "Text", Doc);
-               databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "Indexed", "false");
-               databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "OutGoing", Integer.toString(Number));
-               int x = 0;
-           } catch (Exception ex) {
-               ex.printStackTrace();
-           }
+                databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "Text", Doc);
+                databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "Indexed", "false");
+                databaseConnection.InsertAndUpdateRow("Crawler", URL, "Document", "OutGoing", Integer.toString(Number));
+                int x = 0;
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
 
 
+        }
     }
 
     private void insertRankIntoDB(Ranker target)
