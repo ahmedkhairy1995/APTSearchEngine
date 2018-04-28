@@ -134,8 +134,8 @@ public class Indexer {
 
         //This is needed to stem each and every word in the document
         for(String word : documentText){
-            word = porterStemmer.stem(word);
-            stemmedDocument.add(word);
+            word = porterStemmer.stem(word.toLowerCase());
+            stemmedDocument.add(word.toLowerCase());
         }
 
         //Get all elements as a hierarchy in HTML Format
